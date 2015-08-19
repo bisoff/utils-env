@@ -1,0 +1,4 @@
+git add -A .
+git commit -m "pf$(date +'%d.%m.%y')"
+git push
+# exit

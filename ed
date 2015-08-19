@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+echo EDITOR: $EDITOR
+if [[ -f $1 ]]; then
+	if [[ "$EDITOR" = "" ]]; then
+		start $1
+	  else
+		#echo "$EDITOR $1"
+		$EDITOR "$1"
+	  fi
+  else
+  	file=$(where $1 2>nul)
+  	echo FILE: $file
+  	if [[ "$file" = "" ]]; then
+  		echo file not found
+  	  else
+		if [[ "$EDITOR" = "" ]]; then
+			start $file
+		  else
+  	  		#echo "$EDITOR $file"
+			$EDITOR "$file"
+		  fi
+		#sublime_text.exe
+		#$ED
+  	  fi
+  fi

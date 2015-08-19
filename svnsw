@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+BASE_PATH=c:/app
+if [ -d $BASE_PATH/portablesvn1.8 ]; then
+	echo set default new svn
+	mv $BASE_PATH/portablesvn $BASE_PATH/portablesvn1.7
+	mv $BASE_PATH/portablesvn1.8 $BASE_PATH/portablesvn
+  else
+	if [ -d $BASE_PATH/portablesvn1.7 ]; then
+		echo set default old svn
+		mv $BASE_PATH/portablesvn $BASE_PATH/portablesvn1.8
+		mv $BASE_PATH/portablesvn1.7 $BASE_PATH/portablesvn
+	  fi
+  fi

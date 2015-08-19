@@ -1,0 +1,41 @@
+#!/usr/bin/bash
+#enlist vars from permanent user's environment in rows except PATH
+[[ "$1" = "user" ]] && KEY="HKCU\Environment"
+[[ "$1" = "USER" ]] && KEY="HKCU\Environment"
+[[ "$1" = "" ]] && KEY="HKCU\Environment"
+
+[[ "$1" = "sys" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+[[ "$1" = "SYS" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+
+VARS=$(Reg query "$KEY" | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2)
+VALS=$(Reg query "$KEY" | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f4)
+
+#echo $VARS
+SAVEIFS=$IFS
+IFS=$'\n'
+ARR1=($VARS)
+ARR2=($VALS)
+COUNT=${#ARR1[*]}
+pad='                             '
+RES=
+for (( IDX=1 ; IDX<COUNT; IDX++ )) do
+	#echo -n "${ARR1[$IDX]}"
+	PAD=$(printf '%20s' ${ARR1[$IDX]})
+	var=${ARR1[$IDX]}
+	val=${ARR2[$IDX]}
+	val=${val//\\/\/}
+	val=${val//\%/%%}
+	if [[ "$var" = "PATH" ]] || [[ "$var" = "Path" ]]; then val="<call pathlist instead>"; fi
+	printf "$var %s $val \n" "${pad:${#var}}"
+	ROW=$(printf "$var %s $val" "${pad:${#var}}")
+	if [ "$RES" = "" ]; then
+		RES="$ROW"
+	  else
+	  	RES=$(printf "%s\n%s" "$RES	" "$ROW")
+	  fi
+	#echo -n $PAD
+	#echo -ne "\t"
+	#echo ${ARR2[$IDX]}
+  done
+IFS=$SAVEIFS
+echo "$RES" | sort

@@ -1,0 +1,26 @@
+#!/usr/bin/bash
+#cut  var from permanent user's environment
+#ex.  vardel GOPATH
+
+VAR_NAME=$1
+if [[ "$1" = "" ]]; then
+	echo VAR_NAME param is absent !
+	exit
+  fi
+
+KEY="HKCU\Environment" #user's path
+
+VAR_VALUE=$(Reg.exe query "$KEY" -v $VAR_NAME 2>nul | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+echo [OLD] $VAR_NAME: $VAR_VALUE
+
+if [[ "$VAR_VALUE" = "" ]]; then
+	echo "VAR_VALUE is empty"
+	exit
+  else
+	#echo cmd //C "'""reg delete $KEY /v $VAR_NAME /f""'"
+	eval "cmd //C 'reg delete $KEY /v $VAR_NAME /f '" > nul
+	#/f Выполнение удаления без запроса подтверждения.
+	export >nul
+  fi
+
+

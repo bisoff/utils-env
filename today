@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+#print date/time in german format
+TIMESTAMP=$(date +%Y-%m-%d\ %H:%M:%S)
+echo $TIMESTAMP

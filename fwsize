@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+#FILES=($(ls -1 --ignore='!*' --color=none)); for VALUE in "${FILES[@]}"; do du -s "$VALUE"; done
+#ls -1 --ignore='!*' --quoting-style=c --color=none
+
+#FILE="mmm.rar"
+#du -s "$FILE"
+#exit
+
+SAVEIFS=$IFS; IFS=$(echo -en "\n\b");
+FILES=($(ls -1 --ignore='!*' --ignore='lav' --quoting-style=c --color=none)) #shell-always
+#echo FILES:${FILES[@]}
+#echo FILES[1]: ${FILES[1]}
+#echo FILES[2]: ${FILES[2]}
+#exit
+#du -s "mmm.rar"
+IFS=$SAVEIFS
+
+FILE=${FILES[1]}
+echo FILE:$FILE
+echo FILE:$(echo $FILE)
+exit
+du -s "$FILE
+#du -s \"${FILES[2]}\"
+#for VALUE in "${ARR[@]}"; do echo "$VALUE"; done
+#for VALUE in "${FILES[@]}"; do du -s $VALUE; done

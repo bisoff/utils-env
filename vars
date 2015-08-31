@@ -38,4 +38,4 @@ for (( IDX=1 ; IDX<COUNT; IDX++ )) do
 	#echo ${ARR2[$IDX]}
   done
 IFS=$SAVEIFS
-echo "$RES" | sort
+echo "$RES" | sort -f

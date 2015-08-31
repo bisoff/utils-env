@@ -41,4 +41,4 @@ for VALUE in "${ARR[@]}"; do
 	  fi
   done
 IFS=$SAVEIFS
-echo "$RES" | sort
+echo "$RES" | sort -f

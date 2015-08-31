@@ -5,7 +5,9 @@ OPT="$2"
 #setx DOCS %PWD% # user's data root
 STORAGE=${DOCS//\\/\/}/TLS_SW/.CONFIG # folder for configs
 APPS=/c/app # folder for portable apps
-
+#cp 	-u	copy only when the SOURCE file is newer than the destination file or when the destination file is missing
+#	-p	preserve file attributes if possible
+#	-v	explain what is being done (--verbose)
 if [[ "$APP" = "" ]]; then
 	echo 'USE app option, ex.: "bck sublime"'
 	exit
@@ -26,7 +28,7 @@ case $APP in
 		#plugins list; лексер(sql/plsql:exts, cmd:rems); config(cmd,opts); 9 icons;
 		;;
 
-	st3|subl|sublime)
+	st|st3|subl|sublime)
 		DEST=$STORAGE/sublime
 		#cp -f $APPS/Sublime/Data/Packages/User/*.sublime-settings "$DEST" #users-settings
 		#file="$APPS/Sublime/Data/Packages/User/*.sublime-settings"; echo $file; cp -u -p "$file" "$DEST"
@@ -35,6 +37,9 @@ case $APP in
 		#file='$APPS/Sublime/Data/Packages/User/Default (Windows).sublime-keymap'; echo $file; cp -u -p -v "$file" "$DEST"
 		cp -u -p -v "$APPS/Sublime/Data/Packages/User/Default (Windows).sublime-keymap" "$DEST"
 		#cp -f '$APPS/Sublime/Data/Packages/User/Default (Windows).sublime-keymap' "$DEST" #bindings (hotkeys)
+		#$APPS/Sublime/Data/Packages
+		# plugin list look up in Package Control.sublime-settings
+		# find $APPS/Sublime/Data/Packages -type d \! -name "User" -maxdepth 1  \! -name "Theme*"
 		;;
 	psd|PSD)
 		#~/AppData/Roaming/PLSQL Developer

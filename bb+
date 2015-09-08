@@ -2,15 +2,16 @@
 # Makes a non git directory to a new private bitbucket repository with all files added to initial commit
 # Usage = enter your bitbucket username and password in the script
 
-echo -n Password: && read -s PASSWORD && echo
-USERNAME = "bisoff"
+USERNAME=bisoff
+echo -n Enter password for $USERNAME: && read -s PASSWORD && echo
 
+echo "git init..."
 git init
-echo "...git init"
 
+echo "git add -A ..."
 git add -A .
-echo "...git add -A"
 
+echo "Initial commit..."
 git commit -m "Initial commit"
 
 echo "...creating new remote repo on bitbucket with name ${PWD##*/}"

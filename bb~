@@ -1,0 +1,4 @@
+#!/bin/sh
+echo -n Password: && read -s psw && echo
+echo reading repo list ...
+curl --user bisoff:$psw https://api.bitbucket.org/1.0/user/repositories/ -k -s | jq '.[] | .name + " - " + if .is_private then "private" else "" end'

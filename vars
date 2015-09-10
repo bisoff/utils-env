@@ -26,7 +26,7 @@ for (( IDX=1 ; IDX<COUNT; IDX++ )) do
 	val=${val//\\/\/}
 	val=${val//\%/%%}
 	if [[ "$var" = "PATH" ]] || [[ "$var" = "Path" ]]; then val="<call pathlist instead>"; fi
-	printf "$var %s $val \n" "${pad:${#var}}"
+	#printf "$var %s $val \n" "${pad:${#var}}"
 	ROW=$(printf "$var %s $val" "${pad:${#var}}")
 	if [ "$RES" = "" ]; then
 		RES="$ROW"
@@ -38,4 +38,6 @@ for (( IDX=1 ; IDX<COUNT; IDX++ )) do
 	#echo ${ARR2[$IDX]}
   done
 IFS=$SAVEIFS
-echo "$RES" | sort -f
+echo "$RES" > dd.tmp
+cat dd.tmp | sort -f
+rm dd.tmp

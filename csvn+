@@ -1,0 +1,8 @@
+#!/bin/sh
+#USERNAME=...
+echo -n Enter password for $USERNAME: && read -s PASSWORD && echo
+echo Adding repo ...
+#-H "Accept: Application/json"
+curl -X POST -u $USERNAME:$PASSWORD -H "Content-Type: application/json" "$SVN_NEW"/csvn/api/1/repository?format=json -k -d '{"name":"'${PWD##*/}'"}' | jq ''
+#,"applyStandardLayout":"false","applyTemplateId":1}
+#csvn Release: 5.0.1

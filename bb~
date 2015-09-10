@@ -1,5 +1,4 @@
 #!/bin/sh
-USERNAME=bisoff
-echo -n Enter password for $USERNAME: && read -s PASSWORD && echo
+echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 echo reading repo list ...
-curl --user $USERNAME:$PASSWORD https://api.bitbucket.org/1.0/user/repositories/ -k -s | jq '.[] | .name + " - " + if .is_private then "private" else "" end'
+curl --user $GITUSER:$PASSWORD https://api.bitbucket.org/1.0/user/repositories/ -s | jq '.[] | .name + " - " + if .is_private then "private" else "" end'

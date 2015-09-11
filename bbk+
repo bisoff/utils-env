@@ -1,0 +1,23 @@
+#!/bin/sh
+#You must supply a valid key that is unique across the Bitbucket service.
+#A public key contains characters need to be escaped before sending it as a POST data.
+#So, use the proper escaping ( urlencode ), if you are testing to add a key via your terminal.
+
+#cd ~/.ssh
+#ssh-keygen -t rsa -C "$email" -N "" -f ~/.ssh/$sshfile #email ex. from ~/.gitconfig
+#ssh-add ~/.ssh/$sshfile
+#clear
+
+sshfile=$1
+label=$2
+[[ "$sshfile" = "" ]] && echo "\$1.pub in ~/.ssh/ is not found" && exit 1
+[[ "$label" = "" ]] && echo "label in \$2 is missed" && exit 1
+keycontent=$(<~/.ssh/$sshfile.pub)
+echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
+echo adding repo key ...
+curl --user $GITUSER:$PASSWORD -X POST \
+	https://bitbucket.org/api/1.0/users/$GITUSER/ssh-keys -s \
+	#--data-urlencode "accountname=$user" \
+	--data-urlencode "key=$keycontent" \
+	--data-urlencode "label=$label" \
+	| jq ''

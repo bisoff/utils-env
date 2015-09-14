@@ -1,5 +1,5 @@
 #!/bin/sh
-#rename
+#rename repo
 prj="${PWD##*/}"
 prj_new=$1
 [[ "$prj_new" = "" ]] && echo "new_name in \$1 is missed" && exit 1

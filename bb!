@@ -5,8 +5,8 @@
 to_dir="${PWD##*/}"
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 cd ..
-#git clone https://$GITUSER@bitbucket.org/$GITUSER/$to_dir.git $to_dir
-git clone ssh://git@bitbucket.org/$GITUSER/$to_dir.git $to_dir
+git clone https://$GITUSER@bitbucket.org/$GITUSER/$to_dir.git $to_dir
+#git clone ssh://git@bitbucket.org/$GITUSER/$to_dir.git $to_dir
 #https://$GITUSER@bitbucket.org/$GITUSER/$to_dir.git $to_dir
 #MIIEoQIBAAKCAQEAm3HtgiJEcz780OmM/Jv65LQ/VQcp7ChtVceUwAudC6cy2o6v
 

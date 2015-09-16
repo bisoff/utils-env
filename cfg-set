@@ -1,0 +1,2 @@
+set BASE=%PROGRAMFILES(x86)%
+xcopy /Y psd\templ\* "%BASE%\PLSQL Developer\Template\Bis\."

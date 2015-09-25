@@ -1,0 +1,17 @@
+#!/bin/sh
+#rename repo
+prj="${PWD##*/}"
+prj_new=$1
+[[ "$prj_new" = "" ]] && echo "new_name in \$1 is missed" && exit 1
+echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
+echo renaming repo ...
+#curl -X DELETE --user $GITUSER:$PASSWORD https://api.bitbucket.org/1.0/user/repositories/ --data name=${PWD##*/}
+# | jq '.[] | .name + " - " + if .is_private then "private" else "" end'
+curl --user $GITUSER:$PASSWORD -X PUT https://bitbucket.org/api/2.0/repositories/$GITUSER/${PWD##*/} --data "name=new_repo_name" -s | jq ''
+#curl https://USER:PASS@api.bitbucket.org/1.0/repositories/{accountname}/{old_repo_name} --data "name=new_repo_name" -X PUT
+git remote remove origin
+git remote add origin https://$GITUSER@bitbucket.org/$GITUSER/$prj_new.git
+#git remote add origin ssh://git@bitbucket.org/$GITUSER/$prj_new.git
+cd ..
+mv "$prj" "$prj_new"
+cd "$prj_new"

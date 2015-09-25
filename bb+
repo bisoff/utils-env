@@ -8,7 +8,7 @@ echo "git init..."
 git init
 
 echo "#About" > readme.md
-#TODO IF 
+#TODO IF
 echo "git add -A ..."
 git add -A .
 
@@ -19,8 +19,8 @@ echo "...creating new remote repo on bitbucket with name ${PWD##*/}"
 curl --user $GITUSER:$PASSWORD https://api.bitbucket.org/1.0/repositories/ --data name=${PWD##*/} --data is_private='true' -k -s | jq ''
 
 echo "adding new repo remote URL https://$GITUSER@bitbucket.org/$GITUSER/ ..."
-#git remote add origin https://$GITUSER@bitbucket.org/$GITUSER/${PWD##*/}.git
-git remote add origin ssh://git@bitbucket.org/$GITUSER/${PWD##*/}.git
+git remote add origin https://$GITUSER@bitbucket.org/$GITUSER/${PWD##*/}.git
+#git remote add origin ssh://git@bitbucket.org/$GITUSER/${PWD##*/}.git
 
 echo "git push -u origin --all..."
 git push -u origin --all

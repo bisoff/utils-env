@@ -2,6 +2,8 @@
 # Makes a non git directory to a new private bitbucket repository with all files added to initial commit
 # Usage = enter your bitbucket username and password in the script
 
+echo CLONE remote repo to local folder
+
 to_dir="${PWD##*/}"
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 cd ..

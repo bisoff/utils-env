@@ -1,11 +1,17 @@
 #!/bin/sh
 # Makes a non git directory to a new private bitbucket repository with all files added to initial commit
 # Usage = enter your bitbucket username and password in the script
+echo DELETE: remote repo; local repo
 
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
-echo deleting repo ...
-#curl -X DELETE --user $GITUSER:$PASSWORD https://api.bitbucket.org/1.0/user/repositories/ --data name=${PWD##*/} 
-# | jq '.[] | .name + " - " + if .is_private then "private" else "" end'
-curl --user $GITUSER:$PASSWORD -X DELETE https://bitbucket.org/api/2.0/repositories/$GITUSER/${PWD##*/} -s | jq ''
 
-git remote remove origin
+echo deleting remote repo ...
+#curl -X DELETE --user $GITUSER:$PASSWORD https://api.bitbucket.org/1.0/user/repositories/ --data name=${PWD##*/}
+# | jq '.[] | .name + " - " + if .is_private then "private" else "" end'
+repo=${PWD##*/}
+curl --user $GITUSER:$PASSWORD -X DELETE "https://bitbucket.org/api/2.0/repositories/$GITUSER/$repo" -s | jq ''
+
+echo deleting local repo ...
+#git remote remove origin
+cd ..
+rm -dfv "$repo"

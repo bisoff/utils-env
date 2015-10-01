@@ -1,6 +1,12 @@
 #!/bin/sh
 #USERNAME=...
+echo CLONE remote repo to local folder
+
+#todo: test for empty curr_dir
 echo -n Enter password for $USERNAME: && read -s PASSWORD && echo
-echo "reading repo list for $SVN_NEW:3343..."
-curl -u $USERNAME:$PASSWORD "$SVN_NEW:3343"/csvn/api/1/repository?format=json -k -s | jq '.repositories | .[] | .name'
-# "id" "status" "svnUrl"
+curr_dir=${PWD##*/}
+
+echo "CLONING repo $SVN_NEW/svn/$curr_dir..."
+cd ..
+svn checkout "$SVN_NEW/svn/$curr_dir"
+cd $curr_dir

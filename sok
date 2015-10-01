@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+svn add * --force
+svn commit -m "pf$(date +'%d.%m.%y')"
+# exit

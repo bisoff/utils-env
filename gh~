@@ -1,0 +1,4 @@
+#!/bin/sh
+echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
+echo reading repo list ...
+curl -u "$GITUSER:$PASSWORD" https://api.github.com/user/repos #-s | jq '.[] | .name + " - " + if .private then "private" else "" end'

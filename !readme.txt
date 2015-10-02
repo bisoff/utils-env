@@ -1,0 +1,33 @@
+useful bash scripts for windows developers (require MSYS)
+
+WARNING:
+Some utils require that user has setuped his context (environment variables).
+Ex. GITUSER for bb* utils, SVN_SERVER_URL for csvn* utils, etc.
+
+PURPOSE:
+--- environment tools ---
+var* 		add, drop and enlist (sorted) environment variables in user's context
+path* 		add, drop and enlist (sorted) pathes in PATH variable (add/drop in user's context, enlist in user, system and commin context)
+
+--- vcs tools ---
+bb* 		for rapid drop/add/clone/rename/enlist remote repo and ssh key for BITBUCKET
+csvn*		for rapid add/clone/enlist remote repo for local CollabNet Subversion Edge repo
+gek/gis/gok	for rapid update/commit whole SVN repo (used in button bar in Total Commander)
+sek/sok 	for rapid update/commit whole SVN repo (used in button bar in Total Commander)
+svnsw		switch svn version by renaming folder if you use some versions of CLI svn.
+		  ex. old version of CLI svn that compatible with GUI client, like SmartSVN and last CLI version of svn for new projects/repos
+
+--- file system ---
+cpage		enlist file type of files in path, passed in param (used to define code page of plain text files)
+cpagec		converts to UTF-8 plain text files, with type ANSI-8859 (path passed in param)
+		  used to store CP1251 files in git repo with auto detect code page feature
+fwsize		enlist subfolders size in kb
+
+--- other ---
+today		print to stdout today with time in German format for current timezone
+ed		edit file in editor; ($EDITOR - path to editor, setuped in ~/.bash_profile); file lookuped in PATH by 'where' command
+		  used for rapid open of script file
+mc*		open windows management tool from CLI
+		 (defined tools: computer props, device managment, environment vars, event, shares, services, scheduled tasks, users & groups, password)
+cfg-*		save application config in user repo or set config from repo
+		  (defined: msysgit, sublime)

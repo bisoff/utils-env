@@ -3,9 +3,11 @@
 # Usage = enter your bitbucket username and password in the script
 echo DELETE: remote repo; local repo
 
+[[ "$GITUSER" = "" ]] && echo "\$GITUSER is not defined ! (Use varadd)" && exit 1
+
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 
-echo deleting remote repo ...
+echo DELETING remote repo ...
 #curl -X DELETE --user $GITUSER:$PASSWORD https://api.bitbucket.org/1.0/user/repositories/ --data name=${PWD##*/}
 # | jq '.[] | .name + " - " + if .is_private then "private" else "" end'
 repo=${PWD##*/}

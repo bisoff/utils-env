@@ -1,6 +1,5 @@
 #!/usr/bin/bash
 #pwd
-git add -A .
-git commit -m "pf$(date +'%d.%m.%y')"
+goc
 git push all --all
 # exit

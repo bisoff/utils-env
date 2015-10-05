@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+[[ "$1" = "" ]] && start mmc.exe & exit
+	[[ "$1" = "ad" ]] && start dsac.exe & exit
+[[ "$1" = "comp" ]] && start compmgmt.msc & exit
+[[ "$1" = "dev" ]] && start devmgmt.msc & exit
+	[[  "$1" = "dhcp" ]] && start dhcpmgmt.msc & exit
+[[ "$1" = "disk" ]] && start diskmgmt.msc & exit
+[[ "$1" = "dns" ]] && start dnsmgmt.msc & exit
+[[ "$1" = "env" ]] && rundll32.exe sysdm.cpl,EditEnvironmentVariables & exit
+[[ "$1" = "evt" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\eventvwr.msc" & exit
+	[[ "$1" = "gp" ]] && start mmc.exe %SYSTEMROOT%\SYSTEM32\gpmc.msc & exit
+	[[ "$1" = "hv" ]] && start mmc.exe "%PROGRAMFILES%\Hyper-V\virtmgmt.msc" & exit
+	[[ "$1" = "srv" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\ServerManager.msc" & exit
+[[ "$1" = "share" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\fsmgmt.msc" & exit
+[[ "$1" = "svc" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\services.msc" & exit
+[[ "$1" = "tsk" ]]; then
+	[ -f %SYSTEMROOT%\SYSTEM32\taskschd.msc ]; then
+		start taskschd.msc & exit
+	  else
+	  	start control.exe schedtasks & exit
+	  fi
+  fi
+[[ "$1" = "pwd" ]] && start control.exe userpasswords2 & exit
+[[ "$1" = "usr" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\lusrmgr.msc" & exit
+	[[  "$1" = "wb" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\wbadmin.msc" & exit
+
+echo ""
+echo Management Console Shell
+echo Usage: mc [ad/comp/dev/dhcp/disk/dns/env/evt/gp/hv/srv/share/svc/tsk/usr/pwd/wb]
+echo ""
+

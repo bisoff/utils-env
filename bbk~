@@ -1,5 +1,8 @@
 #!/bin/sh
+echo LIST repo ssh-keys
+
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
+
 echo reading repo keys ...
 curl --user $GITUSER:$PASSWORD https://bitbucket.org/api/1.0/users/$GITUSER/ssh-keys -s | jq ''
 #.[] | .name + " - " + if .is_private then "private" else "" end

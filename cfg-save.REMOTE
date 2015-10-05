@@ -1,20 +1,15 @@
 #!/usr/bin/bash
-
-[[ "$STORAGE" = "" ]] && echo "\$STORAGE is not defined; setup it (ex. in ~/.bash_profile) and reopen shell" && exit 1
 #cd /c/user/docs
-#setx STORAGE %PWD% # user's data root
-
+#setx DOCS %PWD% # user's data root
+[[ "$STORAGE" = "" ]] && echo "\$STORAGE is not defined; setup it (ex. in ~/.bash_profile) and reopen shell" && exit 1
 [[ "$APPS" = "" ]] && echo "\$APPS is not defined; setup it (ex. in ~/.bash_profile) and reopen shell" && exit 1
-#cd /c/app
-#setx APPS %PWD% # portable apps
-
 #cp 	-u	copy only when the SOURCE file is newer than the destination file or when the destination file is missing
 #	-p	preserve file attributes if possible
 #	-v	explain what is being done (--verbose)
 
 APP="$1"
-[[ "$APP" = "" ]] && echo 'USE app option, ex.: "bck sublime"' && exit 1
 OPT="$2"
+[[ "$APP" = "" ]] && echo 'USE app option, ex.: "bck sublime"' && exit 1
 
 case $APP in
 	apps)

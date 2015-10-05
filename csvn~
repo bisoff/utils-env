@@ -1,6 +1,6 @@
 #!/bin/sh
 #USERNAME=...
 echo -n Enter password for $USERNAME: && read -s PASSWORD && echo
-echo reading repo list ...
-curl -u $USERNAME:$PASSWORD "$SVN_NEW"/csvn/api/1/repository?format=json -k -s | jq '.repositories | .[] | .name'
+echo "reading repo list for $SVN_NEW:3343..."
+curl -u $USERNAME:$PASSWORD "$SVN_NEW:3343"/csvn/api/1/repository?format=json -k -s | jq '.repositories | .[] | .name'
 # "id" "status" "svnUrl"

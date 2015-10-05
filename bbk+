@@ -8,13 +8,19 @@
 #ssh-add ~/.ssh/$sshfile
 #clear
 
+#test $GITUSER
+echo "ADD to repo ssh-key from ~/.ssh/ (syntax: bbk+ <filename> <label>)"
+
 sshfile=$1
 label=$2
-[[ "$sshfile" = "" ]] && echo "\$1.pub in ~/.ssh/ is not found" && exit 1
+[[ "$sshfile" = "" ]] && echo "\$1 is missed" && exit 1
+[[ -f "~/.ssh/$sshfile" ]] && sshfile2=$sshfile.pub
+[[ -f "~/.ssh/$sshfile2" ]] && echo "nor $sshfile nor $sshfile2 are not found in ~/.ssh/ " && exit 1
 [[ "$label" = "" ]] && echo "label in \$2 is missed" && exit 1
-keycontent=$(<~/.ssh/$sshfile.pub)
+
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 echo adding repo key ...
+keycontent=$(<~/.ssh/$sshfile.pub)
 curl --user $GITUSER:$PASSWORD -X POST \
 	https://bitbucket.org/api/1.0/users/$GITUSER/ssh-keys -s \
 	#--data-urlencode "accountname=$user" \

@@ -1,8 +1,27 @@
 #!/bin/sh
 #USERNAME=...
 echo -n Enter password for $USERNAME: && read -s PASSWORD && echo
-echo Adding repo ...
+echo "Adding repo to $SVN_NEW ..."
 #-H "Accept: Application/json"
-curl -X POST -u $USERNAME:$PASSWORD -H "Content-Type: application/json" "$SVN_NEW"/csvn/api/1/repository?format=json -k -d '{"name":"'${PWD##*/}'"}' | jq ''
+curr_dir=${PWD##*/}
+RES=$(curl -X POST -u $USERNAME:$PASSWORD -H "Content-Type: application/json" "$SVN_NEW:3343"/csvn/api/1/repository?format=json -s -k -d '{"name":"'$curr_dir'"}')
+#echo $RES
+echo $RES | jq ''
+[[ $? != 0 ]] && cat $RES && exit 1
 #,"applyStandardLayout":"false","applyTemplateId":1}
 #csvn Release: 5.0.1
+
+#[[ "$RES" =~ "errorMessage" ]] && exit 1
+echo $RES | grep 'errorMessage' > /dev/null
+[[ $? = 0 ]] && exit 1
+
+cd ..
+
+svn checkout "$SVN_NEW"/svn/$curr_dir
+
+cd $curr_dir
+
+echo "Initial commit..."
+echo "#About" > readme.md
+svn add readme.md
+svn commit -m "Initial commit"

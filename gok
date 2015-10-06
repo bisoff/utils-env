@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 #pwd
 goc
-git push all --all
+git push #all --all
 # exit

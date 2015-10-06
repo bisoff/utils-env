@@ -7,8 +7,10 @@ echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 echo "git init..."
 git init
 
+#TODO: IF not exists any file
 echo "#About" > readme.md
-#TODO IF
+echo "LGPL3" > license
+
 echo "git add -A ..."
 git add -A .
 
@@ -22,6 +24,6 @@ echo "adding new repo remote URL https://$GITUSER@bitbucket.org/$GITUSER/ ..."
 git remote add orig_bb https://$GITUSER@bitbucket.org/$GITUSER/${PWD##*/}.git
 #git remote add origin ssh://git@bitbucket.org/$GITUSER/${PWD##*/}.git
 
-echo "git push -u origin --all..."
-git push -u orig_bb --all
+echo "git push -u origin ..."
+git push -u orig_bb --all #upstream
 git push -u orig_bb --tags

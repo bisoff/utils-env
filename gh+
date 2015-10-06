@@ -8,6 +8,7 @@ echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 #git init
 
 #echo "#About" > readme.md
+#echo "LGPL3" > license
 #TODO IF
 #echo "git add -A ..."
 #git add -A .
@@ -24,5 +25,6 @@ git remote add orig_gh https://github.com/$GITUSER/${PWD##*/}.git
 #git remote add origin ssh://git@bitbucket.org/$GITUSER/${PWD##*/}.git
 
 echo "git push -u origin_gh --all..."
-git push -u orig_gh --all
+git push -u orig_gh --all # -u: upstream
 git push -u orig_gh --tags
+#git push origin -u

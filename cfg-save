@@ -12,11 +12,40 @@ OPT="$2"
 [[ "$APP" = "" ]] && echo 'USE app option, ex.: "bck sublime"' && exit 1
 
 case $APP in
+	git)
+		#find $APPS/git/cmd -type f -not -iname '*.exe' -a -not -iname 'start-ssh-agent.cmd' -exec cp -u -p -v '{}' "$STORAGE/git/cmd" ';' #-exec echo '{}' \;
+		#cmd !git.exe & !start-ssh-agent.cmd
+		#??? ~/AppData/Roaming/GitCredStore/git-credential-winstore.exe
+		#c:\app\Git\etc\ - gitconfig motd #global
+
+		#config:
+		#file=$APPS/Git/etc/gitconfig;echo $file; cp -u -p -v "$file" "$STORAGE/git/etc"
+		cp -u -p -v "$APPS/Git/etc/gitconfig" "$STORAGE/git/etc"
+		#file=$APPS/Git/etc/motd;echo $file; cp -u -p -v "$file" "$STORAGE/git/etc"
+		cp -u -p -v "$APPS/Git/etc/motd" "$STORAGE/git/etc"
+
+		#user:
+		#file=~/.bash_profile;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.bash_profile "$STORAGE/git/user"
+		#file=~/.bashrc;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.bashrc "$STORAGE/git/user"
+		#file=~/.gitconfig;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.gitconfig "$STORAGE/git/user"
+		#file=~/.inputrc;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.inputrc "$STORAGE/git/user"
+		;;
 	apps)
 		# app list (ls $APPS/)
 		echo "not defined yet"
 		;;
-	env|vars)
+	vars)
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		vars > $FTMP
+		diff $FTMP $STORAGE/vars.txt -a -w -q
+		[ $? = 1 ] && cp -u -p -v $FTMP $STORAGE/vars.txt
+		rm $FTMP
+		;;
+	path)
 		#ChocolateyBinRoot=c:\app; ChocolateyInstall; GRADLE_HOME=c:\app\Gradle; GROOVY_HOME; JAVA_HOME; NLS_LANG; ODA_DEPLOY; ODA_HOME; PATH
 		#см varlist
 		echo "not defined yet"
@@ -26,7 +55,6 @@ case $APP in
 		echo "not defined yet"
 		#plugins list; лексер(sql/plsql:exts, cmd:rems); config(cmd,opts); 9 icons;
 		;;
-
 	st|st3|subl|sublime)
 		DEST=$STORAGE/sublime
 		#cp -f $APPS/Sublime/Data/Packages/User/*.sublime-settings "$DEST" #users-settings
@@ -72,29 +100,6 @@ case $APP in
 		#c:\app\MinGW\msys\1.0\etc\profile  inputrc.default
 		#c:\app\MinGW\msys\1.0\home\pr*
 		echo "not defined yet"
-		;;
-
-	git)
-		#find $APPS/git/cmd -type f -not -iname '*.exe' -a -not -iname 'start-ssh-agent.cmd' -exec cp -u -p -v '{}' "$STORAGE/git/cmd" ';' #-exec echo '{}' \;
-		#cmd !git.exe & !start-ssh-agent.cmd
-		#??? ~/AppData/Roaming/GitCredStore/git-credential-winstore.exe
-		#c:\app\Git\etc\ - gitconfig motd #global
-
-		#config:
-		#file=$APPS/Git/etc/gitconfig;echo $file; cp -u -p -v "$file" "$STORAGE/git/etc"
-		cp -u -p -v "$APPS/Git/etc/gitconfig" "$STORAGE/git/etc"
-		#file=$APPS/Git/etc/motd;echo $file; cp -u -p -v "$file" "$STORAGE/git/etc"
-		cp -u -p -v "$APPS/Git/etc/motd" "$STORAGE/git/etc"
-
-		#user:
-		#file=~/.bash_profile;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
-		cp -u -p -v ~/.bash_profile "$STORAGE/git/user"
-		#file=~/.bashrc;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
-		cp -u -p -v ~/.bashrc "$STORAGE/git/user"
-		#file=~/.gitconfig;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
-		cp -u -p -v ~/.gitconfig "$STORAGE/git/user"
-		#file=~/.inputrc;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
-		cp -u -p -v ~/.inputrc "$STORAGE/git/user"
 		;;
 	tsvn|TortoiseSVN)
 		#~/AppData/Local/TortoiseSVN

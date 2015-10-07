@@ -36,13 +36,41 @@ case $APP in
 		;;
 	apps)
 		# app list (ls $APPS/)
-		echo "not defined yet"
+		echo enlist $APPS/
+
+		save_dir="$PWD"
+		cd "$APPS"
+
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		#echo $FTMP
+		ls -d */ | cut -f1 -d'/' | sort -f > $FTMP
+		echo ---------------------- >> $FTMP
+		ls -p | grep -v / | sort -f >> $FTMP
+
+		docopy=0
+		[[ ! -f $STORAGE/apps.txt ]] && docopy=1 #&& echo target absent
+		if [[ $docopy = 0 ]]; then
+			diff $FTMP $STORAGE/apps.txt -a -w -q
+			[[ $? = 1 ]] && docopy=1 || echo equal
+		  fi
+		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/apps.txt
+
+		rm $FTMP
+		cd $save_dir
 		;;
 	vars)
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
+
 		vars > $FTMP
-		diff $FTMP $STORAGE/vars.txt -a -w -q
-		[ $? = 1 ] && cp -u -p -v $FTMP $STORAGE/vars.txt
+
+		docopy=0
+		[ ! -f $STORAGE/vars.txt ] && docopy=1
+		if [[ $docopy = 0 ]]; then
+			diff $FTMP $STORAGE/vars.txt -a -w -q
+			[[ $? = 1 ]] && docopy=1 || echo equal
+		  fi
+		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/vars.txt
+
 		rm $FTMP
 		;;
 	path)
@@ -50,6 +78,9 @@ case $APP in
 		#см varlist
 		echo "not defined yet"
 		;;
+	lpad|lunchpad)
+		;;
+	#oda) .oda w/o pwd
 	tc|TC)
 		#~/AppData/Roaming/GHISLER
 		echo "not defined yet"
@@ -202,7 +233,7 @@ case $APP in
 		echo "not defined yet"
 		;;
 	idea)
-		#~/ dirs: .IdeaIC13 .oda? .ssh lunchpad
+		#~/ dirs: .IdeaIC13
 		echo "not defined yet"
 		;;
 	*)

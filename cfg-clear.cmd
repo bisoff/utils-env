@@ -1,5 +1,7 @@
 rem http://ru.wikipedia.org/wiki/Переменная_среды_Windows
 rem private media ------------------------------------------------
+pause
+#TODO: tee log
 del /Q c:\ebook\* & rmdir /Q c:\ebook\
 del /Q c:\share\* & rmdir /Q c:\share\
 

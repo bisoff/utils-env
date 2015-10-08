@@ -16,6 +16,18 @@ APP="$1"
 [[ "$APP" = "" ]] && echo 'USE app option, ex.: "bck sublime"' && exit 1
 OPT="$2"
 
+# org - 
+# wiki - docs rules privat
+# models - erd bp wf
+# distro - list links
+# cod - per or od 
+# howto - ses expr orm xml
+# configs - 
+# docs - 
+# prj - 
+# chnp
+# d-integration
+
 case $APP in
 	apps)
 		# app list (ls $APPS/)
@@ -50,6 +62,7 @@ case $APP in
 		#c:\app\PLSQL Developer\
 		#Macro"; документация;  hotkeys; roaming config
 		echo "not defined yet"
+		# xcopy /Y "c:\Program Files (x86)\PLSQL Developer\Template\Bis\*" psd\templ\.
 		;;
 	pd)
 		#~/AppData/Roaming/PowerDesigner

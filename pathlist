@@ -38,7 +38,7 @@ if [[ "$ALL" = "yes" ]]; then
 SAVEIFS=$IFS
 IFS=';'
 RES=
-read -ra ARR <<< "$PATH2"
+read -ra ARR <<< "$PATH2" #ARR=($PATH2) ??
 for VALUE in "${ARR[@]}"; do
 	#echo $VALUE
 	if [ "$RES" = "" ]; then

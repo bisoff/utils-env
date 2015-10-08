@@ -1,4 +1,5 @@
 #!/usr/bin/bash
 svn add * --force
+svn status | grep '^\!' | sed 's/! *//;s/\\/\//' | xargs -I% svn rm %
 svn commit -m "pf$(date +'%d.%m.%y')"
 # exit

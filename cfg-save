@@ -93,6 +93,15 @@ case $APP in
 		rm $FTMP
 		# use: git diff $STORAGE/path.txt
 		;;
+	conemu)
+		#tasks config ?clink
+		echo "not defined yet"
+		c:\app\ConEmu\ConEmu\clink\profile
+		;;
+	clink)
+		#~/AppData/Local
+		echo "not defined yet"
+		;;
 	lpad|lunchpad)
 		;;
 	#oda) .oda w/o pwd
@@ -134,14 +143,6 @@ case $APP in
 		echo "not defined yet"
 		;;
 
-	conemu|ConEmu)
-		#tasks config ?clink
-		echo "not defined yet"
-		;;
-	clink)
-		#~/AppData/Local
-		echo "not defined yet"
-		;;
 	mingw)
 		#c:\app\MinGW\msys\1.0\etc\profile  inputrc.default
 		#c:\app\MinGW\msys\1.0\home\pr*

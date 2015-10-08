@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-git branch all
+git branch -v #all

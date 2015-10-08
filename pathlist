@@ -1,11 +1,18 @@
 #!/usr/bin/bash
 #enlist values from user's PATH to rows
-if [[ "$1" = "sys" ]]; then KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"; fi
-if [[ "$1" = "SYS" ]]; then KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"; fi
-if [[ "$1" = "user" ]]; then KEY="HKCU\Environment"; fi
-if [[ "$1" = "USER" ]]; then KEY="HKCU\Environment"; fi
-if [[ "$1" = "" ]]; then KEY="HKCU\Environment"; fi
-if [[ "$KEY" = "" ]]; then KEY="HKCU\Environment"; fi
+
+shopt  -s  nocasematch
+[[ "$1" = "sys" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+	#if [[ "$1" = "SYS" ]]; then KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"; fi
+[[ "$1" = "user" ]] && KEY="HKCU\Environment"
+	#if [[ "$1" = "USER" ]]; then KEY="HKCU\Environment"; fi
+[[ "$1" = "let" ]] && reusable=true
+shift
+[[ "$1" = "sys" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+[[ "$1" = "user" ]] && KEY="HKCU\Environment"
+[[ "$1" = "let" ]] && reusable=true
+
+[[ "$KEY" = "" ]] && KEY="HKCU\Environment"
 
 ALL=no
 if [[ "$1" = "all" ]]; then ALL=yes; fi
@@ -35,9 +42,9 @@ read -ra ARR <<< "$PATH2"
 for VALUE in "${ARR[@]}"; do
 	#echo $VALUE
 	if [ "$RES" = "" ]; then
-		RES="$VALUE"
+		[[ $reusable = "true" ]] && RES="pathadd '$VALUE'" || RES="$VALUE"
 	  else
-	  	RES=$(printf "%s\n%s" "$RES	" "$VALUE")
+	  	[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "pathadd '$VALUE'") || RES=$(printf "%s\n%s" "$RES" "$VALUE")
 	  fi
   done
 IFS=$SAVEIFS

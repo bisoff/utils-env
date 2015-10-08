@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-pathlist $1
+pathlist $*

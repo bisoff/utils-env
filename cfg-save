@@ -61,22 +61,37 @@ case $APP in
 	vars)
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
 
-		vars > $FTMP
+		vars let > $FTMP
+		echo ---------------------- >> $FTMP
+		vars sys let >> $FTMP
 
 		docopy=0
 		[ ! -f $STORAGE/vars.txt ] && docopy=1
 		if [[ $docopy = 0 ]]; then
 			diff $FTMP $STORAGE/vars.txt -a -w -q
-			[[ $? = 1 ]] && docopy=1 || echo equal
+			[[ $? = 1 ]] && docopy=1 || echo "vars.txt isn't changed"
 		  fi
 		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/vars.txt
 
 		rm $FTMP
 		;;
-	path)
-		#ChocolateyBinRoot=c:\app; ChocolateyInstall; GRADLE_HOME=c:\app\Gradle; GROOVY_HOME; JAVA_HOME; NLS_LANG; ODA_DEPLOY; ODA_HOME; PATH
-		#см varlist
-		echo "not defined yet"
+	path|paths)
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+
+		paths let > $FTMP
+		echo ---------------------- >> $FTMP
+		paths let sys >> $FTMP
+
+		docopy=0
+		[ ! -f $STORAGE/path.txt ] && docopy=1
+		if [[ $docopy = 0 ]]; then
+			diff $FTMP $STORAGE/path.txt -a -w -q
+			[[ $? = 1 ]] && docopy=1 || echo "path.txt isn't changed"
+		  fi
+		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/path.txt
+
+		rm $FTMP
+		# use: git diff $STORAGE/path.txt
 		;;
 	lpad|lunchpad)
 		;;

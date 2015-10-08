@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-#pwd
+pwd | tr 'a-z' 'A-Z'
 git add -A .
 git commit -m "pf$(date +'%d.%m.%y')"
 # exit

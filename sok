@@ -1,4 +1,5 @@
 #!/usr/bin/bash
-pwd
+pwd | tr 'a-z' 'A-Z'
 svn add * --force
-svn commit -m "pf$(date +'%d.%m.%y')"
+svn status | grep '^\!' | sed 's/! *//;s/\\/\//' | xargs -I% svn rm %
+svn commit -m "$GITHOST$(date +'%d.%m.%y')"

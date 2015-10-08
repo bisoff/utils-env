@@ -1,8 +1,0 @@
-#!/usr/bin/bash
-
-OLDIFS=$IFS
-IFS=$'\n' #  bash specific
-for line in (< ./list) do
-	echo "Line: $line"
-  done
-IFS=$OLDIFS

@@ -1,0 +1,260 @@
+#!/usr/bin/bash
+#cd /c/user/docs
+#setx DOCS %PWD% # user's data root
+[[ "$STORAGE" = "" ]] && echo "\$STORAGE is not defined; setup it (ex. in ~/.bash_profile) and reopen shell" && exit 1
+[[ "$APPS" = "" ]] && echo "\$APPS is not defined; setup it (ex. in ~/.bash_profile) and reopen shell" && exit 1
+#cp 	-u	copy only when the SOURCE file is newer than the destination file or when the destination file is missing
+#	-p	preserve file attributes if possible
+#	-v	explain what is being done (--verbose)
+
+APP="$1"
+OPT="$2"
+[[ "$APP" = "" ]] && echo 'USE app option, ex.: "bck sublime"' && exit 1
+
+case $APP in
+	git)
+		#find $APPS/git/cmd -type f -not -iname '*.exe' -a -not -iname 'start-ssh-agent.cmd' -exec cp -u -p -v '{}' "$STORAGE/git/cmd" ';' #-exec echo '{}' \;
+		#cmd !git.exe & !start-ssh-agent.cmd
+		#??? ~/AppData/Roaming/GitCredStore/git-credential-winstore.exe
+		#c:\app\Git\etc\ - gitconfig motd #global
+
+		#config:
+		#file=$APPS/Git/etc/gitconfig;echo $file; cp -u -p -v "$file" "$STORAGE/git/etc"
+		cp -u -p -v "$APPS/Git/etc/gitconfig" "$STORAGE/git/etc"
+		#file=$APPS/Git/etc/motd;echo $file; cp -u -p -v "$file" "$STORAGE/git/etc"
+		cp -u -p -v "$APPS/Git/etc/motd" "$STORAGE/git/etc"
+
+		#user:
+		#file=~/.bash_profile;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.bash_profile "$STORAGE/git/user"
+		#file=~/.bashrc;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.bashrc "$STORAGE/git/user"
+		#file=~/.gitconfig;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.gitconfig "$STORAGE/git/user"
+		#file=~/.inputrc;echo $file; cp -u -p -v "$file" "$STORAGE/git/user"
+		cp -u -p -v ~/.inputrc "$STORAGE/git/user"
+		;;
+	apps)
+		# app list (ls $APPS/)
+		echo enlist $APPS/
+
+		save_dir="$PWD"
+		cd "$APPS"
+
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		#echo $FTMP
+		ls -d */ | cut -f1 -d'/' | sort -f > $FTMP
+		echo ---------------------- >> $FTMP
+		ls -p | grep -v / | sort -f >> $FTMP
+
+		docopy=0
+		[[ ! -f $STORAGE/apps.txt ]] && docopy=1 #&& echo target absent
+		if [[ $docopy = 0 ]]; then
+			diff $FTMP $STORAGE/apps.txt -a -w -q
+			[[ $? = 1 ]] && docopy=1 || echo equal
+		  fi
+		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/apps.txt
+
+		rm $FTMP
+		cd $save_dir
+		;;
+	vars)
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+
+		vars let > $FTMP
+		echo ---------------------- >> $FTMP
+		vars sys let >> $FTMP
+
+		docopy=0
+		[ ! -f $STORAGE/vars.txt ] && docopy=1
+		if [[ $docopy = 0 ]]; then
+			diff $FTMP $STORAGE/vars.txt -a -w -q
+			[[ $? = 1 ]] && docopy=1 || echo "vars.txt isn't changed"
+		  fi
+		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/vars.txt
+
+		rm $FTMP
+		;;
+	path|paths)
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+
+		paths let > $FTMP
+		echo ---------------------- >> $FTMP
+		paths let sys >> $FTMP
+
+		docopy=0
+		[ ! -f $STORAGE/path.txt ] && docopy=1
+		if [[ $docopy = 0 ]]; then
+			diff $FTMP $STORAGE/path.txt -a -w -q
+			[[ $? = 1 ]] && docopy=1 || echo "path.txt isn't changed"
+		  fi
+		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/path.txt
+
+		rm $FTMP
+		# use: git diff $STORAGE/path.txt
+		;;
+	conemu)
+		#tasks config ?clink
+		echo "not defined yet"
+		c:\app\ConEmu\ConEmu\clink\profile
+		;;
+	clink)
+		#~/AppData/Local
+		echo "not defined yet"
+		;;
+	lpad|lunchpad)
+		;;
+	#oda) .oda w/o pwd
+	tc|TC)
+		#~/AppData/Roaming/GHISLER
+		echo "not defined yet"
+		#plugins list; лексер(sql/plsql:exts, cmd:rems); config(cmd,opts); 9 icons;
+		;;
+	st|st3|subl|sublime)
+		DEST=$STORAGE/sublime
+		#cp -f $APPS/Sublime/Data/Packages/User/*.sublime-settings "$DEST" #users-settings
+		#file="$APPS/Sublime/Data/Packages/User/*.sublime-settings"; echo $file; cp -u -p "$file" "$DEST"
+		#echo "$APPS/Sublime/Data/Packages/User/*.sublime-settings" "$DEST"
+		cp -u -p -v $APPS/Sublime/Data/Packages/User/*.sublime-settings "$DEST"
+		#file='$APPS/Sublime/Data/Packages/User/Default (Windows).sublime-keymap'; echo $file; cp -u -p -v "$file" "$DEST"
+		cp -u -p -v "$APPS/Sublime/Data/Packages/User/Default (Windows).sublime-keymap" "$DEST"
+		#cp -f '$APPS/Sublime/Data/Packages/User/Default (Windows).sublime-keymap' "$DEST" #bindings (hotkeys)
+		#$APPS/Sublime/Data/Packages
+		# plugin list look up in Package Control.sublime-settings
+		# find $APPS/Sublime/Data/Packages -type d \! -name "User" -maxdepth 1  \! -name "Theme*"
+		;;
+	psd|PSD)
+		#~/AppData/Roaming/PLSQL Developer
+		#c:\app\PLSQL Developer\
+		#Macro"; документация;  hotkeys; roaming config
+		echo "not defined yet"
+		;;
+	pd)
+		#~/AppData/Roaming/PowerDesigner
+		#~/ files: ?prtran.pdm
+		echo "not defined yet"
+		;;
+	toad)
+		#~/AppData/Roaming/Quest Software/Toad for Oracle
+		echo "not defined yet"
+		;;
+	sd|SQLDeveloper)
+		#~/AppData/Roaming/SQL Developer
+		echo "not defined yet"
+		;;
+
+	mingw)
+		#c:\app\MinGW\msys\1.0\etc\profile  inputrc.default
+		#c:\app\MinGW\msys\1.0\home\pr*
+		echo "not defined yet"
+		;;
+	tsvn|TortoiseSVN)
+		#~/AppData/Local/TortoiseSVN
+		#~/AppData/Roaming/TortoiseSVN
+		echo "not defined yet"
+		;;
+	tgit|TortoiseGIT)
+		#~/AppData/Roaming/TortoiseGit
+		echo "not defined yet"
+		;;
+	ssvn|SmartSVN)
+		#~/AppData/Roaming/syntevo/SmartSVN
+		#~/AppData/Roaming/WANdisco/SmartSVN
+		echo "not defined yet"
+		;;
+	svn)
+		#~/AppData/Roaming/Subversion
+		echo "not defined yet"
+		;;
+	sgit|SmartGit)
+		#~/AppData/Roaming/syntevo/SmartGit
+		echo "not defined yet"
+		;;
+	winmerge|WinMerge)
+		echo "not defined yet"
+		;;
+
+	nuget|NuGet)
+		#~/AppData/Local/NuGet
+		#~/AppData/Roaming/NuGet
+		echo "not defined yet"
+		;;
+	choco)
+		#chocolatey
+		echo "not defined yet"
+		;;
+
+	chrome)
+		#~/AppData/Local/google/chrome
+		echo "not defined yet"
+		;;
+	opera|Opera)
+		#~/AppData/Local
+		#plugins
+		echo "not defined yet"
+		;;
+
+	libs)
+		#java plsql
+		#c:\test
+		echo "not defined yet"
+		;;
+
+	npp|Notepad++)
+		#~/AppData/Roaming/Notepad++
+		echo "not defined yet"
+		;;
+	syn2)
+		#~/AppData/Roaming/SynWrite
+		echo "not defined yet"
+		;;
+	punto)
+		#~/AppData/Roaming/Yandex/Punto Switcher
+		echo "not defined yet"
+		;;
+	sumatra)
+		#c:\app\SumatraPDF-settings.txt
+		echo "not defined yet"
+		;;
+	foxit|Foxit)
+		#~/AppData/Roaming/Foxit Software/Foxit Reader
+		echo "not defined yet"
+		;;
+	calibre)
+		#Calibre Portable
+		echo "not defined yet"
+		;;
+
+	sendmail)
+		echo "not defined yet"
+		;;
+	blat)
+		echo "not defined yet"
+		;;
+	telnet)
+		#dttelnet
+		echo "not defined yet"
+		;;
+
+	dm|datamodeler)
+		#datamodeler
+		echo "not defined yet"
+		;;
+	flyway)
+		#flyway
+		echo "not defined yet"
+		;;
+	eclipse)
+		#eclipse
+		echo "not defined yet"
+		;;
+	idea)
+		#~/ dirs: .IdeaIC13
+		echo "not defined yet"
+		;;
+	*)
+		if [ ! -d $STORAGE/$APP ]; then
+			echo $STORAGE/$APP NOT FOUND!
+		  fi
+		;;
+esac

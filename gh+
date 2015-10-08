@@ -4,24 +4,27 @@
 
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 
-echo "git init..."
-git init
+#echo "git init..."
+#git init
 
-echo "#About" > readme.md
+#echo "#About" > readme.md
+#echo "LGPL3" > license
 #TODO IF
-echo "git add -A ..."
-git add -A .
+#echo "git add -A ..."
+#git add -A .
 
-echo "Initial commit..."
-git commit -m "Initial commit"
+#echo "Initial commit..."
+#git commit -m "Initial commit"
 
-echo "...creating new remote repo on bitbucket with name ${PWD##*/}"
-curl --user $GITUSER:$PASSWORD https://api.bitbucket.org/1.0/repositories/ --data name=${PWD##*/} --data is_private='true' -k -s | jq ''
+echo "...creating new remote repo on bitbucket with name '${PWD##*/}'"
+curl -u $GITUSER:$PASSWORD https://api.github.com/user/repos -k -d '{"name":"'${PWD##*/}'"}' -k -s | jq '.[] | .name + if .private then " - private" else "" end'
+#--data {"private":true} -s
 
-echo "adding new repo remote URL https://$GITUSER@bitbucket.org/$GITUSER/ ..."
-git remote add origin https://$GITUSER@bitbucket.org/$GITUSER/${PWD##*/}.git
+echo "adding new repo remote URL  https://github.com/$GITUSER/${PWD##*/}.git ..."
+git remote add orig_gh https://github.com/$GITUSER/${PWD##*/}.git
 #git remote add origin ssh://git@bitbucket.org/$GITUSER/${PWD##*/}.git
 
-echo "git push -u origin --all..."
-git push -u origin --all
-git push -u origin --tags
+echo "git push -u origin_gh --all..."
+git push -u orig_gh --all # -u: upstream
+git push -u orig_gh --tags
+#git push origin -u

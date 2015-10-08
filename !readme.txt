@@ -12,10 +12,13 @@ path* 		add, drop and enlist (sorted) pathes in PATH variable (add/drop in user'
 --- vcs tools ---
 bb* 		for rapid drop/add/clone/rename/enlist remote repo and ssh key for BITBUCKET
 csvn*		for rapid add/clone/enlist remote repo for local CollabNet Subversion Edge repo
-gek/gis/gok	for rapid update/commit whole SVN repo (used in button bar in Total Commander)
+g*		aliases for GIT commands (ex. for button bar in Total Commander or CLI using)
 sek/sok 	for rapid update/commit whole SVN repo (used in button bar in Total Commander)
-svnsw		switch svn version by renaming folder if you use some versions of CLI svn.
+sw-svn		switch svn version by renaming folder if you use some versions of CLI svn.
 		  ex. old version of CLI svn that compatible with GUI client, like SmartSVN and last CLI version of svn for new projects/repos
+		  this is more convenient than replace PATH var, imho
+sw-git		switch git version by renaming folder if you use some versions of CLI git.
+		  warning: to use it correctly (w/o context loose) run it as ". sw-git" and reopen shell
 
 --- file system ---
 cpage		enlist file type of files in path, passed in param (used to define code page of plain text files)

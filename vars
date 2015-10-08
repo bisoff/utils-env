@@ -1,43 +1,69 @@
 #!/usr/bin/bash
-#enlist vars from permanent user's environment in rows except PATH
-[[ "$1" = "user" ]] && KEY="HKCU\Environment"
+# Enlist vars from permanent user's environment in rows except PATH
+# ex.: DEBUG=true vars sys
+# Warning: extra vars can be defined in ~/.bash_profile ex. by 'export EDITOR=/c/app/sublime/sublime_text.exe'
+
+[[ "$DEBUG" = "" ]] && DEBUG="false"
+
+shopt  -s  nocasematch
 [[ "$1" = "USER" ]] && KEY="HKCU\Environment"
-[[ "$1" = "" ]] && KEY="HKCU\Environment"
-
-[[ "$1" = "sys" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
 [[ "$1" = "SYS" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+[[ "$1" = "let" ]] && reusable=true
+shift
+[[ "$1" = "USER" ]] && KEY="HKCU\Environment"
+[[ "$1" = "SYS" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+[[ "$1" = "let" ]] && reusable=true
 
-VARS=$(Reg query "$KEY" | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2)
-VALS=$(Reg query "$KEY" | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f4)
+[[ "$KEY" = "" ]] && KEY="HKCU\Environment"
 
-#echo $VARS
+FTMP=`mktemp /tmp/tmp.XXXXXX`
+[[ "$DEBUG" = "true" ]] && echo $KEY && echo $FTMP && echo "---------------"
+
+Reg query "$KEY" > $FTMP	 # Reg query "HKCU\Environment"
+#[[ "$DEBUG" = "true" ]] && cat $FTMP && echo "---------------"
+
+VARS=$(cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2)
+#[[ "$DEBUG" = "true" ]] && cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2 && echo "---------------"
+
+VALS=$(cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g")
+#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g" && echo "---------------"
+
+#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
+#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
+#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g"
 SAVEIFS=$IFS
 IFS=$'\n'
 ARR1=($VARS)
 ARR2=($VALS)
 COUNT=${#ARR1[*]}
 pad='                             '
-RES=
-for (( IDX=1 ; IDX<COUNT; IDX++ )) do
+#RES=
+for (( IDX=0 ; IDX<COUNT; IDX++ )) do
 	#echo -n "${ARR1[$IDX]}"
 	PAD=$(printf '%20s' ${ARR1[$IDX]})
 	var=${ARR1[$IDX]}
 	val=${ARR2[$IDX]}
+	if [[ "$DEBUG" = "true" ]]; then
+		[[ $var != "PATH" ]] && echo "$var - $val" || echo "$var - <skipped>"
+	  fi
 	val=${val//\\/\/}
 	val=${val//\%/%%}
-	if [[ "$var" = "PATH" ]] || [[ "$var" = "Path" ]]; then val="<call pathlist instead>"; fi
-	#printf "$var %s $val \n" "${pad:${#var}}"
-	ROW=$(printf "$var %s $val" "${pad:${#var}}")
-	if [ "$RES" = "" ]; then
-		RES="$ROW"
-	  else
-	  	RES=$(printf "%s\n%s" "$RES	" "$ROW")
+	if [[ "$var" != "PATH" ]] && [[ "$var" != "TEMP" ]] && [[ "$var" != "TMP" ]]; then
+		# && val="<call pathlist instead>"
+		[[ "$reusable" = "true" ]] && ROW=$(printf "varadd $var '$val'") || ROW=$(printf "$var %s $val" "${pad:${#var}}")
+		#printf "$var %s $val \n" "${pad:${#var}}"
+		if [[ "$RES" = "" ]]; then
+			RES="$ROW"
+		  else
+		  	[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "$ROW") || RES=$(printf "%s\n%s" "$RES	" "$ROW")
+		  fi
 	  fi
 	#echo -n $PAD
 	#echo -ne "\t"
 	#echo ${ARR2[$IDX]}
   done
 IFS=$SAVEIFS
-echo "$RES" > dd.tmp
-cat dd.tmp | sort -f
-rm dd.tmp
+echo "$RES" > $FTMP #dd.tmp
+cat $FTMP | sort -f
+#rm dd.tmp
+rm $FTMP

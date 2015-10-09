@@ -1,0 +1,2 @@
+#!/bin/sh
+git log -last --pretty=format:"%C(yellow)%h%x09%Creset%an%x09%x09%s" --decorate -30 --graph

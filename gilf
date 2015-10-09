@@ -1,0 +1,2 @@
+#!/bin/sh
+git log --all --pretty=format:"%s - %cd" -5 --name-status

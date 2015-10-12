@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+find $1 -name .git -prune -o -name "*" -type f -exec /bin/file {} \;

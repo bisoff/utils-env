@@ -11,6 +11,18 @@ APP="$1"
 OPT="$2"
 [[ "$APP" = "" ]] && echo 'USE app option, ex.: "bck sublime"' && exit 1
 
+copyWhenDiff() {
+	SRC=$1
+	TARGET=$2
+	docopy=0
+	[ ! -f $TARGET ] && docopy=1
+	if [[ $docopy = 0 ]]; then
+		diff $SRC $TARGET -a -w -q
+		[[ $? = 1 ]] && docopy=1 #|| echo "$TARGET isn't changed"
+	  fi
+	[[ $docopy = 1 ]] && cp -u -p -v $SRC $TARGET || echo "$SRC AND $TARGET no differ"
+  }
+
 case $APP in
 	git)
 		#find $APPS/git/cmd -type f -not -iname '*.exe' -a -not -iname 'start-ssh-agent.cmd' -exec cp -u -p -v '{}' "$STORAGE/git/cmd" ';' #-exec echo '{}' \;
@@ -47,68 +59,76 @@ case $APP in
 		echo ---------------------- >> $FTMP
 		ls -p | grep -v / | sort -f >> $FTMP
 
-		docopy=0
-		[[ ! -f $STORAGE/apps.txt ]] && docopy=1 #&& echo target absent
-		if [[ $docopy = 0 ]]; then
-			diff $FTMP $STORAGE/apps.txt -a -w -q
-			[[ $? = 1 ]] && docopy=1 || echo equal
-		  fi
-		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/apps.txt
+		copyWhenDiff $FTMP "$STORAGE/apps.txt"
+		#docopy=0
+		#[[ ! -f $STORAGE/apps.txt ]] && docopy=1 #&& echo target absent
+		#if [[ $docopy = 0 ]]; then
+		#	diff $FTMP $STORAGE/apps.txt -a -w -q
+		#	[[ $? = 1 ]] && docopy=1 || echo equal
+		#  fi
+		#[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/apps.txt
 
 		rm $FTMP
 		cd $save_dir
 		;;
 	vars)
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		vars let > $FTMP #| tee $FTMP
+		echo ---------------------- >> $FTMP # | tee -a $FTMP #>> $FTMP
+		vars sys let >> $FTMP #| tee -a $FTMP #>> $FTMP
 
-		vars let > $FTMP
-		echo ---------------------- >> $FTMP
-		vars sys let >> $FTMP
-
-		docopy=0
-		[ ! -f $STORAGE/vars.txt ] && docopy=1
-		if [[ $docopy = 0 ]]; then
-			diff $FTMP $STORAGE/vars.txt -a -w -q
-			[[ $? = 1 ]] && docopy=1 || echo "vars.txt isn't changed"
-		  fi
-		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/vars.txt
+		copyWhenDiff $FTMP "$STORAGE/vars.txt"
+		#docopy=0
+		#[ ! -f $STORAGE/vars.txt ] && docopy=1
+		#if [[ $docopy = 0 ]]; then
+		#	diff $FTMP $STORAGE/vars.txt -a -w -q
+		#	[[ $? = 1 ]] && docopy=1 || echo "vars.txt isn't changed"
+		#  fi
+		#[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/vars.txt
 
 		rm $FTMP
 		;;
 	path|paths)
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
-
 		paths let > $FTMP
 		echo ---------------------- >> $FTMP
 		paths let sys >> $FTMP
 
-		docopy=0
-		[ ! -f $STORAGE/path.txt ] && docopy=1
-		if [[ $docopy = 0 ]]; then
-			diff $FTMP $STORAGE/path.txt -a -w -q
-			[[ $? = 1 ]] && docopy=1 || echo "path.txt isn't changed"
-		  fi
-		[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/path.txt
+		copyWhenDiff $FTMP $STORAGE/path.txt
+		#docopy=0
+		#[ ! -f $STORAGE/path.txt ] && docopy=1
+		#if [[ $docopy = 0 ]]; then
+		#	diff $FTMP $STORAGE/path.txt -a -w -q
+		#	[[ $? = 1 ]] && docopy=1 || echo "path.txt isn't changed"
+		#  fi
+		#[[ $docopy = 1 ]] && cp -u -p -v $FTMP $STORAGE/path.txt
 
 		rm $FTMP
 		# use: git diff $STORAGE/path.txt
 		;;
-	conemu)
-		#tasks config ?clink
-		echo "not defined yet"
-		c:\app\ConEmu\ConEmu\clink\profile
-		;;
-	clink)
-		#~/AppData/Local
+	libs)
+		#java plsql
+		#c:\test
 		echo "not defined yet"
 		;;
-	lpad|lunchpad)
-		;;
-	#oda) .oda w/o pwd
-	tc|TC)
-		#~/AppData/Roaming/GHISLER
-		echo "not defined yet"
-		#plugins list; лексер(sql/plsql:exts, cmd:rems); config(cmd,opts); 9 icons;
+	con|conemu)
+		DEST=$STORAGE/Conemu
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		#echo Conemu settings
+		#ls $FTMP
+		echo -e "y\n" | reg.exe export "HKCU\Software\ConEmu" $FTMP > /dev/null #HKEY_CURRENT_USER
+		copyWhenDiff "$FTMP" "$DEST/params.reg"
+		#cp -u -p -v "$FTMP" "$DEST/params.reg"
+		rm $FTMP
+
+		#echo clink settings
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		cat $APPS/ConEmu/ConEmu/clink/profile/settings | grep -v "#" | grep -v "^$" > $FTMP
+		copyWhenDiff "$FTMP" "$DEST/clink_settings"
+		#cp -u -p -v "$FTMP" "$DEST/clink_settings"
+		#~/AppData/Local/clink/clink.log
+		rm $FTMP
+		#cat $APPS/ConEmu/ConEmu/clink/profile/.history
 		;;
 	st|st3|subl|sublime)
 		DEST=$STORAGE/sublime
@@ -123,17 +143,48 @@ case $APP in
 		# plugin list look up in Package Control.sublime-settings
 		# find $APPS/Sublime/Data/Packages -type d \! -name "User" -maxdepth 1  \! -name "Theme*"
 		;;
+	tc|TC)
+		#~/AppData/Roaming/GHISLER
+		echo "not defined yet"
+		#plugins list; лексер(sql/plsql:exts, cmd:rems); config(cmd,opts); 9 icons;
+		;;
 	psd|PSD)
 		#~/AppData/Roaming/PLSQL Developer
 		#c:\app\PLSQL Developer\
 		#Macro"; документация;  hotkeys; roaming config
 		echo "not defined yet"
 		;;
+	lpad|lunchpad)
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		DEST=$STORAGE/win
+		ls $MYROOT/lunchpad | grep -v NRS | sort -f > $FTMP
+		copyWhenDiff "$FTMP" "$DEST/lunchpads.txt"
+		rm $FTMP
+		;;
+	tsvn|TortoiseSVN)
+		#~/AppData/Local/TortoiseSVN
+		#~/AppData/Roaming/TortoiseSVN
+		echo "not defined yet"
+		;;
+	tgit|TortoiseGIT)
+		#~/AppData/Roaming/TortoiseGit
+		echo "not defined yet"
+		;;
+
+	winmerge|WinMerge)
+		echo "not defined yet"
+		;;
+	#?oda) .oda w/o pwd
 	pd)
 		#~/AppData/Roaming/PowerDesigner
 		#~/ files: ?prtran.pdm
 		echo "not defined yet"
 		;;
+	dm|datamodeler)
+		#datamodeler
+		echo "not defined yet"
+		;;
+
 	toad)
 		#~/AppData/Roaming/Quest Software/Toad for Oracle
 		echo "not defined yet"
@@ -148,15 +199,7 @@ case $APP in
 		#c:\app\MinGW\msys\1.0\home\pr*
 		echo "not defined yet"
 		;;
-	tsvn|TortoiseSVN)
-		#~/AppData/Local/TortoiseSVN
-		#~/AppData/Roaming/TortoiseSVN
-		echo "not defined yet"
-		;;
-	tgit|TortoiseGIT)
-		#~/AppData/Roaming/TortoiseGit
-		echo "not defined yet"
-		;;
+
 	ssvn|SmartSVN)
 		#~/AppData/Roaming/syntevo/SmartSVN
 		#~/AppData/Roaming/WANdisco/SmartSVN
@@ -168,9 +211,6 @@ case $APP in
 		;;
 	sgit|SmartGit)
 		#~/AppData/Roaming/syntevo/SmartGit
-		echo "not defined yet"
-		;;
-	winmerge|WinMerge)
 		echo "not defined yet"
 		;;
 
@@ -191,12 +231,6 @@ case $APP in
 	opera|Opera)
 		#~/AppData/Local
 		#plugins
-		echo "not defined yet"
-		;;
-
-	libs)
-		#java plsql
-		#c:\test
 		echo "not defined yet"
 		;;
 
@@ -236,10 +270,6 @@ case $APP in
 		echo "not defined yet"
 		;;
 
-	dm|datamodeler)
-		#datamodeler
-		echo "not defined yet"
-		;;
 	flyway)
 		#flyway
 		echo "not defined yet"

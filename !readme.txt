@@ -21,13 +21,14 @@ sw-git		switch git version by renaming folder if you use some versions of CLI gi
 		  warning: to use it correctly (w/o context loose) run it as ". sw-git" and reopen shell
 
 --- file system ---
-cpage		enlist file type of files in path, passed in param (used to define code page of plain text files)
-cpagec		converts to UTF-8 plain text files, with type ANSI-8859 (path passed in param)
+cp-files	enlist file type of files in path, passed in param (used to define code page of plain text files)
+cp-convert	converts to UTF-8 plain text files, with type ANSI-8859 (path passed in param)
 		  used to store CP1251 files in git repo with auto detect code page feature
 fwsize		enlist subfolders size in kb
 
 --- other ---
 today		print to stdout today with time in German format for current timezone
+pause		a la windows
 ed		edit file in editor; ($EDITOR - path to editor, setuped in ~/.bash_profile); file lookuped in PATH by 'where' command
 		  used for rapid open of script file
 mc*		open windows management tool from CLI

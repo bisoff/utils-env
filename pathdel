@@ -1,10 +1,15 @@
 #!/usr/bin/bash
 #cut value from PATH
-#ex.  pathdel "%ODA_HOME%\bin"
-#ex.  pathdel c:\\app\\git\\cmd
+#ex: . pathdel "%ODA_HOME%\bin"
+#ex: . pathdel c:\\app\\git\\cmd
+#Warning: Use "." lunch syntax to see var immediately
 
 NEWITEM=$1
-if [[ "$1" = "" ]]; then exit; fi
+if [[ "$1" = "" ]]; then
+	echo "path is missed"
+	pause
+	return
+  fi
 
 KEY="HKCU\Environment" #user's path
 KEY_SYS="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment" #system path
@@ -12,7 +17,6 @@ KEY_SYS="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment" #system 
 #разделить path
 #Reg.exe query "HKCU\Environment" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g"
 PATH2=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g") # | sed "s/%\([^%;]\+\)%/$\U\1/g"
-echo OLD: $PATH2
 PATH_NEW=""
 SAVEIFS=$IFS
 IFS=';'
@@ -33,9 +37,11 @@ for VALUE in "${ARR[@]}"; do
 IFS=$SAVEIFS
 
 #добавить new item
+echo OLD: $PATH2
+echo --------------
 echo NEW: $PATH_NEW
 if [[ "$PATH_NEW" = "" ]]; then
-	echo "empty"
+	echo "PATH_NEW is empty"
 	return
   fi
 setx PATH "$PATH_NEW" > nul

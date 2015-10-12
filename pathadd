@@ -2,17 +2,21 @@
 #add value to PATH
 #ex1: . pathadd "%ODA_HOME%\bin"
 #ex2: . pathadd c:\\app\\git\\cmd
-#ex2: . pathadd 'c:\app\git\cmd'
+#ex3: . pathadd 'c:\app\git\cmd'
+#Warning: Use "." lunch syntax to use var immediately
 
 NEWITEM=$1
-if [[ "$1" = "" ]]; then exit; fi
+if [[ "$1" = "" ]]; then
+	echo "path is missed"
+	pause
+	return
+  fi
 
 #разделить path
 KEY="HKCU\Environment"
 KEY_SYS="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
 
 PATH2=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g") # | sed "s/%\([^%;]\+\)%/$\U\1/g"
-echo OLD: $PATH2
 PATH_NEW=""
 SAVEIFS=$IFS
 IFS=';'
@@ -25,7 +29,8 @@ for VALUE in "${ARR[@]}"; do
 	#если совпадает то выйти
 	if [[ "$VALUE" = "$NEWITEM" ]]; then
 		echo already exists
-		exit
+		pause
+		return
 	  fi
 	if [[ "$PATH_NEW" = "" ]]; then
 		PATH_NEW="$VALUE"
@@ -38,6 +43,8 @@ IFS=$SAVEIFS
 PATH_NEW="$PATH_NEW;$NEWITEM"
 #добавить new item
 echo -e "\n"
+echo OLD: $PATH2
+echo --------------
 echo NEW: $PATH_NEW
 if [[ "$PATH_NEW" = "" ]]; then
 	echo "empty"

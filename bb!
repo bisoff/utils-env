@@ -4,6 +4,7 @@
 
 echo CLONE remote repo to local folder
 
+
 to_dir="${PWD##*/}"
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 cd ..

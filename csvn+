@@ -1,10 +1,15 @@
 #!/bin/sh
 #USERNAME=...
+
+[[ "$SVN_ADMIN" = "" ]] && echo "Var SVN_ADMIN is not detected ! Run at first: . varadd SVN_ADMIN '<url with port>'" && exit 1
+[[ "$SVN_REPOS" = "" ]] && echo "Var SVN_REPOS is not detected ! Run at first: . varadd SVN_REPOS '<url>'" && exit 1
+
 echo -n Enter password for $USERNAME: && read -s PASSWORD && echo
-echo "Adding repo to $SVN_NEW ..."
+
+echo "ADDING repo through $SVN_ADMIN ..."
 #-H "Accept: Application/json"
 curr_dir=${PWD##*/}
-RES=$(curl -X POST -u $USERNAME:$PASSWORD -H "Content-Type: application/json" "$SVN_NEW:3343"/csvn/api/1/repository?format=json -s -k -d '{"name":"'$curr_dir'"}')
+RES=$(curl -X POST -u $USERNAME:$PASSWORD -H "Content-Type: application/json" "$SVN_ADMIN"/csvn/api/1/repository?format=json -s -k -d '{"name":"'$curr_dir'"}')
 #echo $RES
 echo $RES | jq ''
 [[ $? != 0 ]] && cat $RES && exit 1
@@ -17,7 +22,7 @@ echo $RES | grep 'errorMessage' > /dev/null
 
 cd ..
 
-svn checkout "$SVN_NEW"/svn/$curr_dir
+svn checkout "$SVN_REPOS"/svn/$curr_dir
 
 cd $curr_dir
 

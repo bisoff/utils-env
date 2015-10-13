@@ -1,0 +1,11 @@
+#!/bin/sh
+#EX: fget xt_runstats.sql https://raw.githubusercontent.com/xtender/xt_runstats/master
+#EX: fget https://raw.githubusercontent.com/xtender/xt_runstats/master/xt_runstats.sql
+FNAME=$1
+URL=$2
+#CURR_DIR=$PWD
+#cd $SYSTEMROOT/System32/WindowsPowerShell/v1.0
+#ls powershell.exe
+#powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "((new-object net.webclient).DownloadFile('$URL/$FNAME', '$CURR_DIR/$FNAME'))"
+#$SYSTEMROOT/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "((new-object net.webclient).DownloadFile('$URL/$FNAME', '$FNAME'))"
+$SYSTEMROOT/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "((new-object net.webclient).DownloadFile('$FNAME', [System.IO.Path]::GetFileName('$FNAME') ))"

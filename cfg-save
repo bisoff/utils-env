@@ -158,6 +158,7 @@ case $APP in
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
 		DEST=$STORAGE/win
 		ls $MYROOT/lunchpad | grep -v NRS | sort -f > $FTMP
+		#~\lunchpad\* ??
 		copyWhenDiff "$FTMP" "$DEST/lunchpads.txt"
 		rm $FTMP
 		;;

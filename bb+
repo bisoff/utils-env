@@ -25,5 +25,11 @@ git remote add orig_bb https://$GITUSER@bitbucket.org/$GITUSER/${PWD##*/}.git
 #git remote add origin ssh://git@bitbucket.org/$GITUSER/${PWD##*/}.git
 
 echo "git push -u origin ..."
-git push -u orig_bb --all #upstream
-git push -u orig_bb --tags
+git push -u orig_bb master
+#git push -u orig_bb --all #upstream
+#git push -u orig_bb --tags
+
+#if https repo raise: fatal: could not read Password for 'https://bisoff@bitbucket.org': No such file or directory
+#try this:
+#git config --global credential.helper wincred # save pwd at windows pwd store
+#git config --global core.askpass /usr/libexec/git-core/git-gui--askpass #ask pwd if missed

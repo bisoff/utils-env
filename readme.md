@@ -1,7 +1,9 @@
 ## ABOUT
 Useful bash scripts for MSYS users
+
 Some utils requires context (environment variables). Ex. GITUSER for bb* utils, SVN_REPOS for csvn* utils, etc.
-My advices - use Conemu and extend PATH var to easy lunch utils in CLI
+
+My advice - use Conemu and extend PATH var to easy lunch utils in CLI
 
 ### INSTALL (BASH):
 	clone https://github.com/bisoff/utils.git utils

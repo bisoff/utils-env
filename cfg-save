@@ -128,9 +128,48 @@ case $APP in
 		# find $APPS/Sublime/Data/Packages -type d \! -name "User" -maxdepth 1  \! -name "Theme*"
 		;;
 	tc|TC)
-		#~/AppData/Roaming/GHISLER
-		echo "not defined yet"
+		DEST=$CONFIGS/TotCmd
+		if [[ -f ~/AppData/Roaming/GHISLER/lsplugin.ini ]]; then
+			mkdir -p $DEST/AppData/Roaming/GHISLER
+			cp -u -p -v ~/AppData/Roaming/GHISLER/lsplugin.ini "$DEST/AppData/Roaming/GHISLER/lsplugin.ini"
+		  fi
+		#~/AppData/Roaming/GHISLER/wincmd.ini
+		#	+[Configuration]
+		#	+[Layout]
+		#	 [MkDirHistory]
+		#	 [left]
+		#	 [right]
+		#	 [FileSystemPlugins64]
+		#	+[Lister]
+		#	 [1920x1080 (8x16)]
+		#	?[Tabstops]
+		#	 [SearchText]
+		#	+[Confirmation]
+		#	 [ContentPlugins64]
+		#	 [SearchName]
+		#	 [SearchIn]
+		#	+[Buttonbar]
+		#	 [Command line history]
+		#	+[Packer]
+		#	+[Shortcuts]
+		#	 [RenameTemplates]
+		#	 [RenameSearchFind]
+		#	 [RenameSearchReplace]
+		#	+[ListerPlugins]
+		#	 [ListerPlugins64]
+		#	 [Selection]
+		#	 [lefttabs]
+		#	 [righttabs]
+		#	 [RightHistory]
+		#	 [LeftHistory]
+		# 	?приоритет плагинов
 		#plugins list; лексер(sql/plsql:exts, cmd:rems); config(cmd,opts); 9 icons;
+		cp -u -p -v $APPS/totalcmd/wincmd.key "$DEST"
+		cp -u -p -v $APPS/totalcmd/DEFAULT.BAR "$DEST"
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		ls $APPS/totalcmd/plugins/wlx | sort -f > $FTMP
+		copyWhenDiff "$FTMP" "$DEST/plugins.txt"
+		rm $FTMP
 		;;
 	psd|PSD)
 		#~/AppData/Roaming/PLSQL Developer

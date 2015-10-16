@@ -15,7 +15,7 @@ copyWhenDiff() {
 	SRC=$1
 	TARGET=$2
 	docopy=0
-	[ ! -f $TARGET ] && docopy=1
+	[ ! -f $TARGET ] && docopy=1 #&& echo new
 	if [[ $docopy = 0 ]]; then
 		diff $SRC $TARGET -a -w -q
 		[[ $? = 1 ]] && docopy=1 #|| echo "$TARGET isn't changed"
@@ -76,16 +76,10 @@ case $APP in
 		vars let > $FTMP #| tee $FTMP
 		echo ---------------------- >> $FTMP # | tee -a $FTMP #>> $FTMP
 		vars sys let >> $FTMP #| tee -a $FTMP #>> $FTMP
+		echo ---------------------- >> $FTMP
+		vars msys >> $FTMP
 
 		copyWhenDiff $FTMP "$CONFIGS/vars.txt"
-		#docopy=0
-		#[ ! -f $CONFIGS/vars.txt ] && docopy=1
-		#if [[ $docopy = 0 ]]; then
-		#	diff $FTMP $CONFIGS/vars.txt -a -w -q
-		#	[[ $? = 1 ]] && docopy=1 || echo "vars.txt isn't changed"
-		#  fi
-		#[[ $docopy = 1 ]] && cp -u -p -v $FTMP $CONFIGS/vars.txt
-
 		rm $FTMP
 		;;
 	path|paths)
@@ -93,43 +87,32 @@ case $APP in
 		paths let > $FTMP
 		echo ---------------------- >> $FTMP
 		paths let sys >> $FTMP
-
 		copyWhenDiff $FTMP $CONFIGS/path.txt
-		#docopy=0
-		#[ ! -f $CONFIGS/path.txt ] && docopy=1
-		#if [[ $docopy = 0 ]]; then
-		#	diff $FTMP $CONFIGS/path.txt -a -w -q
-		#	[[ $? = 1 ]] && docopy=1 || echo "path.txt isn't changed"
-		#  fi
-		#[[ $docopy = 1 ]] && cp -u -p -v $FTMP $CONFIGS/path.txt
-
 		rm $FTMP
-		# use: git diff $CONFIGS/path.txt
 		;;
 	libs)
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
 		ls $libs > $FTMP
-		copyWhenDiff $FTMP $CONFIGS/path.txt
+		copyWhenDiff $FTMP $CONFIGS/libs.txt
+		rm $FTMP
+		;;
+	root|myroot)
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		ls $MYROOT -A | sort -f > $FTMP
+		copyWhenDiff $FTMP $CONFIGS/myroot.txt
 		rm $FTMP
 		;;
 	con|conemu)
 		DEST=$CONFIGS/Conemu
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
-		#echo Conemu settings
-		#ls $FTMP
 		echo -e "y\n" | reg.exe export "HKCU\Software\ConEmu" $FTMP > /dev/null #HKEY_CURRENT_USER
 		copyWhenDiff "$FTMP" "$DEST/params.reg"
-		#cp -u -p -v "$FTMP" "$DEST/params.reg"
 		rm $FTMP
 
-		#echo clink settings
 		FTMP=`mktemp /tmp/tmp.XXXXXX`
 		cat $APPS/ConEmu/ConEmu/clink/profile/settings | grep -v "#" | grep -v "^$" > $FTMP
 		copyWhenDiff "$FTMP" "$DEST/clink_settings"
-		#cp -u -p -v "$FTMP" "$DEST/clink_settings"
-		#~/AppData/Local/clink/clink.log
 		rm $FTMP
-		#cat $APPS/ConEmu/ConEmu/clink/profile/.history
 		;;
 	st|st3|subl|sublime)
 		DEST=$CONFIGS/sublime

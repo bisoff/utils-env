@@ -10,5 +10,5 @@ curr_dir=${PWD##*/}
 
 echo "CLONING repo $SVN_REPOS/svn/$curr_dir..."
 cd ..
-svn checkout "$SVN_REPOS/svn/$curr_dir"
+svn checkout --username="$USERNAME" --password="$PASSWORD" "$SVN_REPOS/svn/$curr_dir"
 cd $curr_dir

@@ -5,65 +5,72 @@
 
 [[ "$DEBUG" = "" ]] && DEBUG="false"
 
-shopt  -s  nocasematch
+msysvars=false
+shopt -s nocasematch
 [[ "$1" = "USER" ]] && KEY="HKCU\Environment"
 [[ "$1" = "SYS" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
 [[ "$1" = "let" ]] && reusable=true
+[[ "$1" = "msys" ]] && msysvars=true
 shift
 [[ "$1" = "USER" ]] && KEY="HKCU\Environment"
 [[ "$1" = "SYS" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
 [[ "$1" = "let" ]] && reusable=true
+[[ "$1" = "msys" ]] && msysvars=true
 
 [[ "$KEY" = "" ]] && KEY="HKCU\Environment"
 
 FTMP=`mktemp /tmp/tmp.XXXXXX`
-[[ "$DEBUG" = "true" ]] && echo $KEY && echo $FTMP && echo "---------------"
+[[ "$DEBUG" = "true" ]] && echo KEY:$KEY && echo $FTMP && echo "---------------"
 
-Reg query "$KEY" > $FTMP	 # Reg query "HKCU\Environment"
-#[[ "$DEBUG" = "true" ]] && cat $FTMP && echo "---------------"
+if [[ "$msysvars" = "true" ]]; then
+	cat ~/.bash_profile | grep "export"
+  else
+	Reg query "$KEY" > $FTMP	 # Reg query "HKCU\Environment"
+	#[[ "$DEBUG" = "true" ]] && cat $FTMP && echo "---------------"
 
-VARS=$(cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2)
-#[[ "$DEBUG" = "true" ]] && cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2 && echo "---------------"
+	VARS=$(cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2)
+	#[[ "$DEBUG" = "true" ]] && cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2 && echo "---------------"
 
-VALS=$(cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g")
-#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g" && echo "---------------"
+	VALS=$(cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g")
+	#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g" && echo "---------------"
 
-#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
-#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
-#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g"
-SAVEIFS=$IFS
-IFS=$'\n'
-ARR1=($VARS)
-ARR2=($VALS)
-COUNT=${#ARR1[*]}
-pad='                             '
-#RES=
-for (( IDX=0 ; IDX<COUNT; IDX++ )) do
-	#echo -n "${ARR1[$IDX]}"
-	PAD=$(printf '%20s' ${ARR1[$IDX]})
-	var=${ARR1[$IDX]}
-	val=${ARR2[$IDX]}
-	if [[ "$DEBUG" = "true" ]]; then
-		[[ $var != "PATH" ]] && echo "$var - $val" || echo "$var - <skipped>"
-	  fi
-	val=${val//\\/\/}
-	val=${val//\%/%%}
-	if [[ "$var" != "PATH" ]] && [[ "$var" != "TEMP" ]] && [[ "$var" != "TMP" ]]; then
-		# && val="<call pathlist instead>"
-		[[ "$reusable" = "true" ]] && ROW=$(printf "varadd $var '$val'") || ROW=$(printf "$var %s $val" "${pad:${#var}}")
-		#printf "$var %s $val \n" "${pad:${#var}}"
-		if [[ "$RES" = "" ]]; then
-			RES="$ROW"
-		  else
-		  	[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "$ROW") || RES=$(printf "%s\n%s" "$RES	" "$ROW")
+	#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
+	#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
+	#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g"
+	SAVEIFS=$IFS
+	IFS=$'\n'
+	ARR1=($VARS)
+	ARR2=($VALS)
+	COUNT=${#ARR1[*]}
+	pad='                             '
+	#RES=
+	for (( IDX=0 ; IDX<COUNT; IDX++ )) do
+		#echo -n "${ARR1[$IDX]}"
+		PAD=$(printf '%20s' ${ARR1[$IDX]})
+		var=${ARR1[$IDX]}
+		val=${ARR2[$IDX]}
+		if [[ "$DEBUG" = "true" ]]; then
+			[[ $var != "PATH" ]] && echo "$var - $val" || echo "$var - <skipped>"
 		  fi
-	  fi
-	#echo -n $PAD
-	#echo -ne "\t"
-	#echo ${ARR2[$IDX]}
-  done
-IFS=$SAVEIFS
-echo "$RES" > $FTMP #dd.tmp
-cat $FTMP | sort -f
-#rm dd.tmp
-rm $FTMP
+		val=${val//\\/\/}
+		val=${val//\%/%%}
+		if [[ "$var" != "PATH" ]] && [[ "$var" != "TEMP" ]] && [[ "$var" != "TMP" ]]; then
+			# && val="<call pathlist instead>"
+			[[ "$reusable" = "true" ]] && ROW=$(printf "varadd $var '$val'") || ROW=$(printf "$var %s $val" "${pad:${#var}}")
+			#printf "$var %s $val \n" "${pad:${#var}}"
+			if [[ "$RES" = "" ]]; then
+				RES="$ROW"
+			  else
+			  	[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "$ROW") || RES=$(printf "%s\n%s" "$RES	" "$ROW")
+			  fi
+		  fi
+		#echo -n $PAD
+		#echo -ne "\t"
+		#echo ${ARR2[$IDX]}
+	  done
+	IFS=$SAVEIFS
+	echo "$RES" > $FTMP #dd.tmp
+	cat $FTMP | sort -f
+	#rm dd.tmp
+	rm $FTMP
+  fi

@@ -22,7 +22,8 @@ echo $RES | grep 'errorMessage' > /dev/null
 
 cd ..
 
-svn checkout "$SVN_REPOS"/svn/$curr_dir
+echo "Checkout.."
+svn checkout --username="$USERNAME" --password="$PASSWORD" "$SVN_REPOS"/svn/$curr_dir
 
 cd $curr_dir
 

@@ -1,2 +1,2 @@
-#!/bin/sh
-git log --all --pretty=format:"%s - %cd" -5 --name-status
+#!/bin/bash
+git log --all --pretty=format:"%C(yellow)%h%Creset - %C(red)%s%Creset - %an%x09%x09" -10 --name-status

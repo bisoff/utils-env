@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "ADDED   DELETED"
+git log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate -10 --numstat
+
+#git log --numstat --pretty --oneline 0f5d22e..HEAD -- <filename>

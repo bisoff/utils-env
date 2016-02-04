@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 msg=$1
 pwd | tr 'a-z' 'A-Z'
 git add -A .

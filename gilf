@@ -1,2 +1,7 @@
 #!/bin/bash
-git log --all --pretty=format:"%C(yellow)%h%Creset - %C(red)%s%Creset - %an%x09%x09" -10 --name-status
+if [[ "$1" == "" ]];then
+	commits_num=10
+  else
+  	commits_num=$1
+  fi
+git log --all --pretty=format:"%C(yellow)%h%Creset - %C(red)%s%Creset - %an%x09%x09" -n $commits_num --name-status

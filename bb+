@@ -2,6 +2,8 @@
 # Makes a non git directory to a new private bitbucket repository with all files added to initial commit
 # Usage = enter your bitbucket GITUSER and password in the script
 
+[[ "$GITUSER" == "" ]] && echo "\$GITUSER not defined!" && exit
+
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo
 
 echo "git init..."

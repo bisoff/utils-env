@@ -1,4 +1,6 @@
 #!/bin/sh
+[[ "$GITUSER" == "" ]] && echo "\$GITUSER not defined!" && exit
+
 echo LIST repo ssh-keys
 
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo

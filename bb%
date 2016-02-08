@@ -1,5 +1,7 @@
 #!/bin/sh
 #rename repo
+[[ "$GITUSER" == "" ]] && echo "\$GITUSER not defined!" && exit
+
 echo RENAME repo to new (param1)
 
 prj="${PWD##*/}"

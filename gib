@@ -1,2 +1,6 @@
 #!/bin/bash
-git branch -a -vv #all
+if [[ "$1" == "" ]]; then
+	git branch -a -vv
+  else
+  	git checkout $1
+  fi

@@ -2,6 +2,8 @@
 # Makes a non git directory to a new private bitbucket repository with all files added to initial commit
 # Usage = enter your bitbucket username and password in the script
 
+[[ "$GITUSER" == "" ]] && echo "\$GITUSER not defined!" && exit
+
 echo CLONE remote repo to local folder
 [[ "$1" != "" ]] && TMP_GITUSER=$1 || TMP_GITUSER=$GITUSER
 

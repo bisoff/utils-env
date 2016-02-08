@@ -1,4 +1,6 @@
 #!/bin/sh
+[[ "$GITUSER" == "" ]] && echo "\$GITUSER not defined!" && exit
+
 echo DELETE repo ssh-key
 [[ "$1" = "" ]] && echo key_id is missed && exit 1
 echo -n Enter password for $GITUSER: && read -s PASSWORD && echo

@@ -1,4 +1,5 @@
 #!/bin/bash
+[[ "$GITHOST" == "" ]] && echo "\$GITHOST not defined!" && exit
 msg=$1
 pwd | tr 'a-z' 'A-Z'
 git add -A .

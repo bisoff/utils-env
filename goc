@@ -3,6 +3,7 @@
 msg=$1
 #pwd | tr 'a-z' 'A-Z'
 git add -A .
-git commit -m "$(echo $GITHOST)_$(date +'%d.%m.%y_%k:%M') $msg"
+[[ "$msg" == "" ]] && msg=up
+git commit -m "$(echo $GITHOST)_$msg" # $(date +'%d.%m.%y_%k:%M')
 gilf 1
 # exit

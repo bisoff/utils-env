@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ "$1" == "" ]];then
-	commits_num=10
+	commits_num=5
   else
   	commits_num=$1
   fi
-git log --all --pretty=format:"%C(yellow)%h%Creset - %C(red)%s%Creset - %an%x09%x09" -n $commits_num --name-status
+git log --all --date=iso --pretty=format:"%C(yellow)%h%Creset - %C(red)%s%Creset - %an - %ad%x08%x08%x08%x08%x08%x08%x08%x08%x08" -n $commits_num --name-status

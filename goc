@@ -1,7 +1,7 @@
 #!/bin/bash
 [[ "$GITHOST" == "" ]] && echo "\$GITHOST not defined!" && exit
 msg=$1
-pwd | tr 'a-z' 'A-Z'
+#pwd | tr 'a-z' 'A-Z'
 git add -A .
 git commit -m "$(echo $GITHOST)_$(date +'%d.%m.%y_%k:%M') $msg"
 gilf 1

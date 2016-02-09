@@ -9,6 +9,6 @@ get_branch() {
 echo -e "BRANCH: \033[0;32;40m$(get_branch)\033[m"
 git add -A .
 [[ "$msg" == "" ]] && msg=up
-git commit -m "$(echo $GITHOST)_$msg" # $(date +'%d.%m.%y_%k:%M')
+git commit -m "$(echo $GITHOST)-$msg" # $(date +'%d.%m.%y_%k:%M')
 gilf 1
 # exit

@@ -6,3 +6,4 @@ FNAME=$1
 #ls powershell.exe
 #$SYSTEMROOT/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "((new-object net.webclient).DownloadFile('$URL/$FNAME', '$FNAME'))"
 $SYSTEMROOT/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "((new-object net.webclient).DownloadFile('$FNAME', [System.IO.Path]::GetFileName('$FNAME') ))"
+

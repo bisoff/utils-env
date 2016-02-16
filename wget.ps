@@ -1,0 +1,15 @@
+;PowerShell 2.0 (Windows 7 preinstalled) you can use:
+(New-Object Net.WebClient).DownloadFile('http://www.foo.com/package.zip', 'package.zip')
+
+(new-object System.Net.WebClient).DownloadFile('http://www.xyz.net/file.txt','C:\tmp\file.tx‌​t')
+
+;If you have PowerShell >= 3.0, you can use Invoke-WebRequest
+Invoke-WebRequest -OutFile index.html http://superuser.com
+
+
+Invoke-WebRequest http://www.foo.com/package.zip -OutFile package.zip
+From a batch file they are called:
+
+powershell -Command "(New-Object Net.WebClient).DownloadFile('http://www.foo.com/package.zip', 'package.zip')"
+powershell -Command "Invoke-WebRequest http://www.foo.com/package.zip -OutFile package.zip"
+(PowerShell 2.0 is available for installation on XP, 3.0 for Windows 7)

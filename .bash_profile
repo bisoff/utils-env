@@ -71,5 +71,5 @@ alias pg_restore='/Library/PostgreSQL/9.4/bin/pg_restore -h dev-db.mivar.pro -U 
 alias pg_dump='/Library/PostgreSQL/9.4/bin/pg_dump -h dev-db.mivar.pro -U postgres'
 alias psql='/Library/PostgreSQL/9.4/bin/psql -h dev-db.mivar.pro -U postgres'
 
-[[ -s ~/.bashrc ]] && source ~/.bashrc
-
+export EDITOR=subl #'subl -w'
+export VIEWER="pygmentize -g"

@@ -1,0 +1,6 @@
+#!/bin/bash
+# ex.: win2unix "*"
+
+#echo "$1"
+# TODO: detect * w/o ""  [[ "$2" != "" ]] && echo one param (mask) required && exit
+sed -i '' 's/'$'\r''//' $1

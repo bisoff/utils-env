@@ -27,7 +27,7 @@ if [[ -f $1 ]]; then
 		[[ "$platform" == "" ]] && start $1
 	  else
 		#echo "$EDITOR $1"
-		$EDITOR "$1"
+		"$EDITOR" "$1"
 	  fi
   else
   	file=$(which $1 2>/dev/null)
@@ -41,7 +41,7 @@ if [[ -f $1 ]]; then
 			[[ "$platform" == "Cygwin" ]] && start $file
 		  else
   	  		#echo "$EDITOR $file"
-			$EDITOR "$file"
+			"$EDITOR" "$file"
 		  fi
 		#sublime_text.exe
 		#$ED

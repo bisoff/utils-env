@@ -1,0 +1,30 @@
+#!/bin/bash
+chcp.com 65001
+path_add=$(cmd //c "echo %CD%")
+echo path_add: $path_add
+
+setx PATH "$PATH" #;$path_add
+echo PATH: $PATH
+ #??sudo mkdir /usr/local/bin
+
+#pathadd "$PWD"
+
+#ln -s /Applications/Sublime\ Text\ 3.app/Contents/SharedSupport/bin/subl /usr/local/bin/subl
+
+#setup ~/.bash_profile
+#	export PATH=~/prj/utils-sh:$PATH # pwd?
+#	export GITUSER=???
+#	export GITHOST=ok
+#	[[ -s ~/.bashrc ]] && source ~/.bashrc
+#setup ~/.bashrc
+#	export EDITOR='subl -w'
+
+#chmod +x (* like #!/bin..)
+
+#sudo brew install jq #https://stedolan.github.io/jq/download/
+
+cat <<<EOF
+#!/bin/sh -e
+/c/Program\ Files/Sublime\ Text\ 3/sublime_text.exe $*
+EOF >  /usr/bin/subl
+chmod +x /usr/bin/subl

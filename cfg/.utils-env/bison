@@ -1,0 +1,98 @@
+#!/bin/bash
+export PATH=$PATH:~/prj/utils-sh
+#export PS1="\\033[0;34;48m[\u / \h] \\033[0;32;49m\w$git_branch: \033[m" #\\033[0;33;49m
+#parse_git_branch() { git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/' }
+
+#[[ -s ~/.bashrc ]] && source ~/.bashrc
+#alias subl= #ime_text
+#alias a2x='python ~/prj/asciidoc/a2x.py'
+#alias asciidoc='~/prj/asciidoc/asciidoc.py'
+
+export CLICOLOR=1 #enables coloring of your terminal
+#export LSCOLORS=GxFxCxDxBxegedabagaced # specifies how to color specific items
+export COLUMNS=200 #ширина терминала 
+
+export subl="/c/Program\ Files/Sublime\ Text\ 3/subl.exe" #--multiinstance
+export EDITOR='subl' # 'subl -w' 
+export VIEWER="pygmentize -g"
+
+#0x00-0x07:  standard colors (as in ESC [ 30..37 m)
+#0x08-0x0f:  high intensity colors (as in ESC [ 90..97 m)
+#0x10-0xe7:  6*6*6=216 colors: 16 + 36*r + 6*g + b (0≤r,g,b≤5)
+#0xe8-0xff:  grayscale from black to white in 24 steps
+
+#setf is limited to only 8 colors. setaf can set up to 256 colors.
+
+#tput setaf [1-7] установка цвета символов с использованием ANSI ESC- последовательности;
+#tput setab [1-7] установка цвета фона;
+#tput rev обратить цвета фона и переднего плана;
+#tput bold установка жирного начертания;
+#tput dim отключение жирного начертания;
+#tput smul установка подчеркнутого начертания;
+#tput rmul отключение подчеркнутого начертания.
+
+#export black=$(tput setaf 0)
+#export red=$(tput setaf 1)
+#export green=$(tput setaf 2)
+#export yellow=$(tput setaf 3)
+#export blue=$(tput setaf 4)
+#export magenta=$(tput setaf 5)
+#export cyan=$(tput setaf 6)
+#export white=$(tput setaf 7)
+#export norm=$(tput sgr0)
+
+#export bright=$(tput bold)
+#export blink=$(tput blink)
+#export reverse=$(tput smso)
+#export underline=$(tput smul)
+#tput rmul – exit underline mode
+#export halfbright=$(tput dim) # turn on half-bright mode
+
+#tput rev – Turn on reverse mode
+#tput smso – Enter standout mode (bold on rxvt)
+#tput rmso – Exit standout mode
+#tput sgr0 – Turn off all attributes
+
+#export lime_yellow=$(tput setaf 190)
+#export powder_blue=$(tput setaf 153)
+
+#export norm=$(tput sgr0)
+
+
+#http://mediadoneright.com/content/ultimate-git-ps1-bash-prompt
+
+#\033[01;32m\u:\033[01;34m \W\033[01;34m \$\033[00m
+
+export blue="\033[0;34;48m"
+export magenta="\033[0;35;40m" 
+export green="\033[0;32;49m"
+export red="\033[0;31;40m"
+export norm="\033[0;38;48m"
+export yellow="\033[0;33;49m"
+
+export green_dim="\033[2;32;49m"
+export red_dim="\033[2;31;48m"
+export blue_dim="\033[2;34;48m"
+export white_dim="\033[1;37;40m"
+export cyan_dim="\033[2;36;48m"
+export magenta_dim="\033[2;35;49m"
+
+export red_bright="\033[1;31;48m"
+
+export grey="\033[2;37;49m"
+
+export grey_back="\033[7;37;49m"
+export cyan_back="\033[7;36;40m"
+
+export cyan_bold="\033[1;36;40m"
+
+
+alias ls='ls -G1'
+alias lsc='ls -GC'
+alias lsn='ls -an'
+
+alias bp='. ~/.bash_profile'
+alias bpe='ed ~/.bash_profile'
+
+#Обратите внимание на  после каждого цвета в строке приглашения.
+#Это сделано для того, чтобу у bash'а не ехала крыша при определении длины промпта и текст командной строки не "съезжал".

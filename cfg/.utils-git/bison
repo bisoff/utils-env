@@ -35,7 +35,12 @@ export zerowidthspace=`echo -e "\xE2\x80\x8B"`
 #echo -e "\[$green\] $curr_branch\[$magenta\]->$(current_remote) \[$cyan_bold\]$(files_status)\[$norm\]" #$green
 
 #export PS1="$cyan_back \w $norm$green\$(current_branch)$magenta->\$(current_remote) $cyan_bold`files_status`$norm$cyan_back > $norm " 
-export PS1="\[$cyan_back\] \w \[$norm\]\[$green\]\$(current_branch)\[$magenta\]\$(remote_for_ps1)\[$cyan_bold\]\[$green\]\$(git_staged)\[$red\]\$(git_deleted)\[$norm\]\[$cyan_back\] > \[$norm\] " 
+export PS1="\[$cyan_back\] \w\[$norm\] \[$green\]\$(current_branch)\[$magenta\]\$(remote_for_ps1)\[$cyan_bold\]\[$green\]\$(git_staged)\[$red\]\$(git_deleted)\[$norm\]\[$cyan_back\] > \[$norm\] \$(renametab)" 
+
+renametab () {
+	if [ "$ConEmuPID" != "" ]; then ConEmuC -GuiMacro Rename 0 "${PWD##*/}" 1> /dev/null; fi
+	if [ "$TERM_PROGRAM" == "Apple_Terminal" ]; then echo -ne "\033]0;${PWD##*/}\007"; fi
+}
 
 #export PS1="$blue_dark[\u / \h] $cyan_bold\w$green\$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'): \[\033[m\]" 
 

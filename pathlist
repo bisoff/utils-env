@@ -1,51 +1,70 @@
-#!/usr/bin/bash
+#!/bin/bash
 #enlist values from user's PATH to rows
 
+# parse ARGS:
 shopt  -s  nocasematch
-[[ "$1" = "sys" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
-	#if [[ "$1" = "SYS" ]]; then KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"; fi
-[[ "$1" = "user" ]] && KEY="HKCU\Environment"
-	#if [[ "$1" = "USER" ]]; then KEY="HKCU\Environment"; fi
-[[ "$1" = "let" ]] && reusable=true
-shift
-[[ "$1" = "sys" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
-[[ "$1" = "user" ]] && KEY="HKCU\Environment"
-[[ "$1" = "let" ]] && reusable=true
-
-[[ "$KEY" = "" ]] && KEY="HKCU\Environment"
-
 ALL=no
-if [[ "$1" = "all" ]]; then ALL=yes; fi
-#Reg.exe query HKCU\\Environment -v PATH
-#Reg.exe query $KEY -v PATH | grep PATH | sed -n 	"s/\([^[:blank:]]\+\)/\1/p" # "/.*/p"
-#echo -n '    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\' | sed -n "s/^\([[:blank:]]\+[^[:blank:]]\+\)/\1/p"
-#    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\
-#echo -n '    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\' | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g"
-#C:\app\RailsInstaller\Ruby2.1.0\
+[[ "$1" = "sys" ]]  && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment" # if [[ "$1" = "SYS" ]]; then KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"; fi
+[[ "$1" = "user" ]] && KEY="HKCU\Environment" # if [[ "$1" = "USER" ]]; then KEY="HKCU\Environment"; fi
+[[ "$1" = "let" ]]  && reusable=true
+[[ "$1" = "all" ]]  && ALL=yes
+shift
+[[ "$1" = "sys" ]]  && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+[[ "$1" = "user" ]] && KEY="HKCU\Environment"
+[[ "$1" = "let" ]]  && reusable=true
+[[ "$1" = "all" ]]  && ALL=yes
 
-#echo ==$KEY==
-#echo Reg.exe query $KEY -v PATH
-#Reg.exe query "$KEY" -v PATH
-PATH2=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
-if [[ "$2" = "all" ]]; then ALL=yes; fi
-if [[ "$2" = "ALL" ]]; then ALL=yes; fi
-if [[ "$ALL" = "yes" ]]; then
-	echo  --------------------------------------------------------------------------------
-	echo "$PATH2"
-	echo  --------------------------------------------------------------------------------
-  fi
+if [ "$TERM" == "cygwin" ]; then
+	[[ "$KEY" = "" ]] && KEY="HKCU\Environment"
 
-SAVEIFS=$IFS
-IFS=';'
-RES=
-read -ra ARR <<< "$PATH2" #ARR=($PATH2) ??
-for VALUE in "${ARR[@]}"; do
-	#echo $VALUE
-	if [ "$RES" = "" ]; then
-		[[ $reusable = "true" ]] && RES="pathadd '$VALUE'" || RES="$VALUE"
-	  else
-	  	[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "pathadd '$VALUE'") || RES=$(printf "%s\n%s" "$RES" "$VALUE")
+	#Reg.exe query HKCU\\Environment -v PATH
+	#Reg.exe query $KEY -v PATH | grep PATH | sed -n 	"s/\([^[:blank:]]\+\)/\1/p" # "/.*/p"
+	#echo -n '    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\' | sed -n "s/^\([[:blank:]]\+[^[:blank:]]\+\)/\1/p"
+	#    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\
+	#echo -n '    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\' | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g"
+	#C:\app\RailsInstaller\Ruby2.1.0\
+
+	#echo ==$KEY==
+	#echo Reg.exe query $KEY -v PATH
+	#Reg.exe query "$KEY" -v PATH
+	PATH2=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	if [[ "$ALL" = "yes" ]]; then
+		echo  --------------------------------------------------------------------------------
+		echo "$PATH2"
+		echo  --------------------------------------------------------------------------------
 	  fi
-  done
-IFS=$SAVEIFS
+
+	SAVEIFS=$IFS
+	IFS=';'
+	RES=
+	read -ra ARR <<< "$PATH2" #ARR=($PATH2) ??
+	for VALUE in "${ARR[@]}"; do
+		#echo $VALUE
+		if [ "$RES" = "" ]; then
+			[[ $reusable = "true" ]] && RES="pathadd '$VALUE'" || RES="$VALUE"
+		  else
+			[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "pathadd '$VALUE'") || RES=$(printf "%s\n%s" "$RES" "$VALUE")
+		  fi
+	  done
+	IFS=$SAVEIFS
+  else
+	ARR=(`echo $PATH | tr ':' '\n'`)
+	RES= # current result with paths
+	for VALUE in "${ARR[@]}"; do
+		# echo $VALUE
+		if [ "$RES" = "" ]; then
+			if [[ $reusable = "true" ]]; then
+				RES="pathadd '$VALUE'"
+			  else
+			  	RES="$VALUE"
+			  fi
+		  else
+			if [[ $reusable = "true" ]]; then
+				RES=$(printf "%s\n%s" "$RES" "pathadd '$VALUE'")
+			  else
+			  	RES=$(printf "%s\n%s" "$RES" "$VALUE")
+			  fi
+		  fi
+	  done
+  fi
 echo "$RES" | sort -f

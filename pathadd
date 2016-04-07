@@ -9,7 +9,7 @@
 
 NEWITEM=$1
 if [[ "$NEWITEM" = "" ]]; then
-	NEWITEM=$(pwd)
+	NEWITEM=$(cmd //c "echo %CD%")
 	#echo "path is missed"
 	#pause
 	#return

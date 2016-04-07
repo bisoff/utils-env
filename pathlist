@@ -15,6 +15,7 @@ shift
 [[ "$1" = "all" ]]  && ALL=yes
 
 if [ "$TERM" == "cygwin" ]; then
+	#echo $TERM
 	[[ "$KEY" = "" ]] && KEY="HKCU\Environment"
 
 	#Reg.exe query HKCU\\Environment -v PATH
@@ -67,4 +68,4 @@ if [ "$TERM" == "cygwin" ]; then
 		  fi
 	  done
   fi
-echo "$RES" | sort -f
+echo "$RES" | sort #-f

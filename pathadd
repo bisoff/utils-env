@@ -9,7 +9,15 @@
 
 NEWITEM=$1
 if [[ "$NEWITEM" = "" ]]; then
-	NEWITEM=$(cmd //c "echo %CD%")
+	echo "for msys will add path to user's Environment"
+	echo "for linux/osx will add to ~/.bash_profile"
+	echo "path ignored if already present"
+	echo "ex for msys:		. pathadd \"%PROJECT_HOME%\bin\""
+	echo "ex : 			. pathadd c:\\app\\git\\cmd"
+	echo "ex3: 			. pathadd 'c:\app\git\cmd'"
+	echo "ex for current path: 	. pathadd ."
+	exit
+  fi
 	#echo "path is missed"
 	#pause
 	#return
@@ -17,6 +25,7 @@ if [[ "$NEWITEM" = "" ]]; then
 
 #разделить path
 if [ "$TERM" == "cygwin" ]; then
+	[[ "$NEWITEM" = "." ]] && NEWITEM=$(cmd //c "echo %CD%")
 	KEY="HKCU\Environment"
 	KEY_SYS="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
 
@@ -71,6 +80,7 @@ if [ "$TERM" == "cygwin" ]; then
 	 #echo $PATH_CURR
 	PATH="$PATH_CURR"  # TODO: в PATH остаются проценты из PATH_NEW
   else
+  	[[ "$NEWITEM" = "." ]] && NEWITEM=$(pwd) #
   	ARR=(`echo $PATH | tr ':' '\n'`)
 	for VALUE in "${ARR[@]}"; do
 		#echo $VALUE = $NEWITEM

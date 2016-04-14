@@ -1,10 +1,13 @@
 #!/bin/bash
-canondirslashes() {
-	local p
-	p="$(echo $1 | tr '\\' '/')" 
-	echo ${p%/}
+winPath2msys() {
+	#"$( test "${1:1:1}" != : && echo $1 || echo $(echo /${1::1} | tr [A-Z] [a-z])${1:2} )" 
+	#p="$(echo $1 | tr '\\' '/')" 
+	#echo ${p%/}
+	local win_path=$1
+	win_path="${win_path//\\/\/}"
+	win_path="/${win_path/://}"
+	#printf "%s" "$1" | sed -r 's!(.):([\\\/].*)$!/\1\2!;s!\\!/!g'
 	}
-
-canonpath() {
-	canondirslashes "$( test "${1:1:1}" != : && echo $1 || echo $(echo /${1::1} | tr [A-Z] [a-z])${1:2} )" 
+msysPath2win() {
+	CYGPATH -w "$1"
 	}

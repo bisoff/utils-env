@@ -1,2 +1,2 @@
 #!/bin/bash
-ed ~/.utils-env/default.cfg
+ed ~/.utils-env/utils-env-include

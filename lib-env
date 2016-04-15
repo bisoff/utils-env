@@ -9,5 +9,6 @@ winPath2msys() {
 	#printf "%s" "$1" | sed -r 's!(.):([\\\/].*)$!/\1\2!;s!\\!/!g'
 	}
 msysPath2win() {
+	# todo : test for msys
 	CYGPATH -w "$1"
 	}

@@ -1,4 +1,6 @@
 #!/bin/bash
+# https://habrahabr.ru/post/119436/
+# http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 ansi-codes() {
               #0  Reset all attributes
               #1  Bright

@@ -21,7 +21,6 @@ if [[ "$NEWITEM" = "" ]]; then
 	#echo "path is missed"
 	#pause
 	#return
-  fi
 
 #разделить path
 if [ "$TERM" == "cygwin" ]; then

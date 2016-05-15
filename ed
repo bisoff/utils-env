@@ -30,9 +30,9 @@ if [[ -f $1 ]]; then
 		"$EDITOR" "$1"
 	  fi
   else
-  	file=$(which $1 2>/dev/null)
+  	[ "$1" != "" ] && file=$(which $1 2>/dev/null)
 	#[[ "$platform" == "Cygwin" ]] && file=$(where $1 2>nul)
-  	if [[ "$file" = "" ]]; then
+  	if [[ "$1" != "" && "$file" = "" ]]; then
   		echo FILE NOT FOUND. current path: $PWD
   	  else
 		echo FILE: $file
@@ -41,7 +41,7 @@ if [[ -f $1 ]]; then
 			[[ "$platform" == "Cygwin" ]] && start $file
 		  else
   	  		#echo "$EDITOR $file"
-			"$EDITOR" "$file"
+  	  		"$EDITOR" "$file"
 		  fi
 		#sublime_text.exe
 		#$ED

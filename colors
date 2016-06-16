@@ -9,12 +9,13 @@ ansi-codes() {
                 #5  Blink
               #7  Reverse
                 #8  Hidden
-      for a in 2 0 1 4 7; do # 5 8
+      for a in 2 0 1 4 7 5; do # 5 8
               [ $a -eq 2 ] && echo "Dim (2):" 
               [ $a -eq 0 ] && echo "Norm (0-reset):" 
               [ $a -eq 4 ] && echo "Underscore (4):" 
               [ $a -eq 1 ] && echo "Bright (1):" 
               [ $a -eq 7 ] && echo "Reverse (7):" 
+              [ $a -eq 5 ] && echo "Blink (5):" 
               for (( f=1; f<=9; f++ )) ; do # #f in 1 8 9
                       # 
                       for b in 0 8 9 ; do # (( b=0; b<=9; b++ )); do # 1-7: background

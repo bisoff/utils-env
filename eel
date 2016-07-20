@@ -1,2 +1,2 @@
 #!/bin/bash
-ed lib-env
+ed $APPS_ROOT/utils-env/lib-env

@@ -29,6 +29,6 @@ if [[ "$VAR_VALUE" = "" ]]; then
 	exit
   fi
 #echo setx $VAR_NAME "$VAR_VALUE"
-setx -m $VAR_NAME "$VAR_VALUE" >nul
+setx -m $VAR_NAME "$VAR_VALUE" > \dev\nul
 
 export $VAR_NAME

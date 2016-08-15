@@ -1,0 +1,18 @@
+pathprepend
+pathremove
+
+export PATH=
+	/etc/profile
+	/etc/bashrc
+	~/.bashrc
+	~/.bash_profile
+
+http://superuser.com/questions/324616/how-should-i-set-the-path-variable-on-my-mac-so-the-hombrew-installed-tools-are
+http://www.cyberciti.biz/faq/appleosx-bash-unix-change-set-path-environment-variable/
+http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html
+
+http://www.linuxfromscratch.org/blfs/view/svn/postlfs/profile.html
+
+http://stackoverflow.com/questions/22502759/mac-os-x-10-9-setting-permanent-environment-variables
+http://askubuntu.com/questions/633774/the-path-added-to-bash-profile-is-not-working-after-reboot
+http://unix.stackexchange.com/questions/138504/setting-path-vs-exporting-path-in-bash-profile

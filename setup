@@ -6,6 +6,7 @@ echo path_add: $path_add
 setx PATH "$PATH" #;$path_add
 echo PATH: $PATH
  #??sudo mkdir /usr/local/bin
+pause
 
 #pathadd "$PWD"
 
@@ -28,3 +29,6 @@ cat <<<EOF
 /c/Program\ Files/Sublime\ Text\ 3/sublime_text.exe $*
 EOF >  /usr/bin/subl
 chmod +x /usr/bin/subl
+
+# msys?: mkdir /usr/local/bin
+

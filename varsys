@@ -1,3 +1,0 @@
-#!/usr/bin/bash
-#enlist vars from permanent system environment in rows except PATH
-vars sys

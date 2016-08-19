@@ -1,4 +1,5 @@
 #!/bin/bash
+platform=$(uname -s)
 winPath2msys() {
 	#"$( test "${1:1:1}" != : && echo $1 || echo $(echo /${1::1} | tr [A-Z] [a-z])${1:2} )" 
 	#p="$(echo $1 | tr '\\' '/')" 
@@ -11,4 +12,710 @@ winPath2msys() {
 msysPath2win() {
 	# todo : test for msys
 	CYGPATH -w "$1"
+	}
+cmd_utils_env_win2unix(){ # win2unix
+	# ex.: win2unix "*"
+	# echo "$1"
+	# TODO: detect * w/o ""  [[ "$2" != "" ]] && echo one param (mask) required && exit
+	sed -i '' 's/'$'\r''//' $1
+	}
+
+cmd_utils_env_uninstall(){ # e-remove
+	null
+	}
+
+cmd_utils_env_ascii(){ # ascii
+	for (( a=1; a<=0xF; a++ )) ; do
+		for (( b=0; b<=0xF; b++ )) ; do
+			#[[ $a -eq 0 ]] && code=`printf "%x" $b` 			# printf "%x " $b #echo -n "$b " #
+			#[[ $a -ne 0 ]] && code=`printf "%x\n" $(( 16 * a + b ))` 	# printf "%x " $(( 16 * a + b )) # echo -n "$(( 16 * a + b )) " 
+			#echo -n "$(( 16 * a + b )) "
+			#printf "%x " $(( 16 * a + b ))
+			#printf "%n %x " $(( 16 * a + b ))  $(( 16 * a + b )) 
+			  #printf "%x " $a$b
+			  #code=`printf "%x\n" $a$b`
+			#code=$(( 16 * a + b )) 
+			hex=$(printf "%X" $(( 16 * a + b )) )
+			[[ $hex == "1B" ]] && echo -ne "$hex:  "
+			[[ $hex != "1B" ]] && echo -ne "$hex:\\x$hex  "
+		done
+		echo
+	#echo
+	done
+	}
+cmd_utils_env_cfg_diff() { # cfg-diff
+	"c:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe" -command diff -path:"$1"
+	}
+cmd_utils_env_colors(){ # colors
+	# https://habrahabr.ru/post/119436/
+	# http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+
+	# Foreground Colours
+	#30 Black
+	#31 Red
+	#32 Green
+	#33 Yellow
+	#34 Blue
+	#35 Magenta
+	#36 Cyan
+	#37 White
+
+	# Background Colours
+	#40 Black
+	#41 Red
+	#42 Green
+	#43 Yellow
+	#44 Blue
+	#45 Magenta
+	#46 Cyan
+	#47 White
+
+	#0  Reset all attributes
+	#1  Bright
+	#2  Dim
+	#4  Underscore  
+	  #5  Blink
+	#7  Reverse
+	  #8  Hidden
+	for a in 2 0 1 4 7 5; do  # 5 8
+	      [ $a -eq 2 ] && echo "Dim (2):" 
+	      [ $a -eq 0 ] && echo "Norm (0-reset):" 
+	      [ $a -eq 4 ] && echo "Underscore (4):" 
+	      [ $a -eq 1 ] && echo "Bright (1):" 
+	      [ $a -eq 7 ] && echo "Reverse (7):" 
+	      [ $a -eq 5 ] && echo "Blink (5):" 
+	      for (( f=1; f<=9; f++ )) ; do # #f in 1 8 9
+	              # 
+	              for b in 0 8 9 ; do # (( b=0; b<=9; b++ )); do # 1-7: background
+	                      #echo -ne "f=$f b=$b" 
+	                      echo -ne "\\033[${a};3${f};4${b}m"
+	                      echo -ne "\\\\\\\\033[${a};3${f};4${b}m"
+	                      echo -ne "\\033[0m "
+	              done
+	      echo
+	      done
+	      #echo
+	done
+	echo
+	}
+cmd_utils_env_cp-convert(){ # cp-convert
+	# ! /usr/bin/bash
+	find $1 -name .git -prune -o -name "*" -type f -exec /bin/file {} \; | grep ASCII\\\|ISO-8859 | sed 's/\(.*\):.*/iconv -f CP1251 -t UTF-8 "\1" \> tmpfile \&\& mv tmpfile "\1"/'
+	}
+cmd_utils_env_cp_files(){ # cp-files
+	find $1 -name .git -prune -o -name "*" -type f -exec /bin/file {} \;
+	}
+cmd_utils_env_docbook_register(){ # docbook-register
+	set -e # Bail out if anything goes wrong
+	which -s brew # Make sure Homebrew and DocBook are present
+	docbook="$(brew --prefix docbook)"
+	test -d "$docbook"
+	test -d /etc/xml || mkdir /etc/xml # Make sure the XML catalog is present
+	test -f /etc/xml/catalog || xmlcatalog --noout --create /etc/xml/catalog
+	for catalog in "$docbook"/docbook/{xml,xsl}/*/catalog.xml; do # Register DocBook in the global XML catalog
+		xmlcatalog --noout --del "file://$catalog" /etc/xml/catalog
+		xmlcatalog --noout --add "nextCatalog" "" "file://$catalog" /etc/xml/catalog
+	  done
+	}
+cmd_utils_env_ed(){ # ed
+	echo EDITOR: $EDITOR
+	platform=$(uname -s) # with no arguments will name the operating system.  - Cygwin Darwin Linux FreeBSD  linux-gnu msys win32 WindowsNT SunOS->Solaris AIX
+	#http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
+	#echo $OSTYPE # darwin14
+	#platform=${OSTYPE//[0-9.]/} – ABach Sep 28 '11 at 21:47	 	
+	#case $OSTYPE in darwin*) echo I am a Mac ;; esac
+	#if [[ $OSTYPE == darwin* ]]; 
+	# [[ "$OSTYPE" == "linux-gnu" ]]; then
+	# [[ "$OSTYPE" == "darwin"* ]]; then
+	# [[ "$OSTYPE" == "cygwin" ]]; then        # POSIX compatibility layer and Linux environment emulation for Windows
+	# [[ "$OSTYPE" == "msys" ]]; then         # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+	# [[ "$OSTYPE" == "win32" ]]; then         # I'm not sure this can happen.
+	# [[ "$OSTYPE" == "freebsd"* ]]; then
+	#else        # Unknown.
+	#case "$OSTYPE" in
+	#  solaris*) echo "SOLARIS" ;;
+	#  darwin*)  echo "OSX" ;; 
+	#  linux*)   echo "LINUX" ;;
+	#  bsd*)     echo "BSD" ;;
+	#  *)        echo "unknown: $OSTYPE" ;;
+	#esac
+
+	if [[ -f $1 ]]; then
+		if [[ "$EDITOR" = "" ]]; then
+			[[ "$platform" == "Darwin" ]] && vim $1 #echo editor #
+			[[ "$platform" == "" ]] && start $1
+		  else
+			#echo "$EDITOR $1"
+			"$EDITOR" "$1"
+		  fi
+	  else
+	  	[ "$1" != "" ] && file=$(which $1 2>/dev/null)
+		#[[ "$platform" == "Cygwin" ]] && file=$(where $1 2>nul)
+	  	if [[ "$1" != "" && "$file" = "" ]]; then
+	  		echo FILE NOT FOUND. current path: $PWD
+	  	  else
+			echo FILE: $file
+	  		if [[ "$EDITOR" = "" ]]; then
+				[[ "$platform" == "Darwin" ]] && vim $file
+				[[ "$platform" == "Cygwin" ]] && start $file
+			  else
+	  	  		#echo "$EDITOR $file"
+	  	  		"$EDITOR" "$file"
+			  fi
+			#sublime_text.exe
+			#$ED
+	  	  fi
+	  fi
+	}
+cmd_utils_env_fwsize(){ # fwsize
+	SAVEIFS=$IFS
+	IFS=$(echo -en "\n\b");
+	FILES=($(ls -1 --color=none)) # --ignore='lav' --ignore='!*' --quoting-style=shell '' --quoting-style=c-""
+	 #echo ${FILES[*]}
+	IFS=$SAVEIFS
+
+	count=${#FILES[*]}
+	count=$[count	 - 1]
+	#for FILE in ${FILES[@]}; do
+	ii=0
+	while [ $ii -le $count ] ; do
+		 #echo $ii
+		 #echo ${FILES[$ii]}
+		FILE=${FILES[$ii]}
+		 # for --quoting-style=c
+		 # 	cmd="echo $FILE"
+		 # 	FILE=$(eval $cmd)
+		du -s "$FILE"
+		ii=$[ii + 1]
+	  done
+	}
+cmd_utils_env_mc(){ # mc-w / mc  conflicts w/Midnight Commander 
+	# platform=$(uname -s)
+	#if [ "$platform" == "Cygwin" ]; then 
+		#[[ "$1" = "" ]] && start mmc.exe & exit
+		#	[[ "$1" = "ad" ]] && start dsac.exe & exit
+		#[[ "$1" = "comp" ]] && start compmgmt.msc & exit
+		#[[ "$1" = "dev" ]] && start devmgmt.msc & exit
+		#	[[  "$1" = "dhcp" ]] && start dhcpmgmt.msc & exit
+		#[[ "$1" = "disk" ]] && start diskmgmt.msc & exit
+		#[[ "$1" = "dns" ]] && start dnsmgmt.msc & exit
+		#[[ "$1" = "env" ]] && rundll32.exe sysdm.cpl,EditEnvironmentVariables & exit
+		#[[ "$1" = "evt" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\eventvwr.msc" & exit
+		#	[[ "$1" = "gp" ]] && start mmc.exe %SYSTEMROOT%\SYSTEM32\gpmc.msc & exit
+		#	[[ "$1" = "hv" ]] && start mmc.exe "%PROGRAMFILES%\Hyper-V\virtmgmt.msc" & exit
+		#	[[ "$1" = "srv" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\ServerManager.msc" & exit
+		#[[ "$1" = "share" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\fsmgmt.msc" & exit
+		#[[ "$1" = "svc" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\services.msc" & exit
+		#[[ "$1" = "tsk" ]]; then
+		#	[ -f %SYSTEMROOT%\SYSTEM32\taskschd.msc ]; then
+		#		start taskschd.msc & exit
+		#	  else
+		#	  	start control.exe schedtasks & exit
+		#	  fi
+		#  fi
+		#[[ "$1" = "pwd" ]] && start control.exe userpasswords2 & exit
+		#[[ "$1" = "usr" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\lusrmgr.msc" & exit
+		#	[[  "$1" = "wb" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\wbadmin.msc" & exit
+		#
+		#echo ""
+		#echo Management Console Shell
+		#echo Usage: mc [ad/comp/dev/dhcp/disk/dns/env/evt/gp/hv/srv/share/svc/tsk/usr/pwd/wb]
+		#echo ""
+	#  fi
+
+	if [[ "$1" = "comp" ]]; then start compmgmt.msc & exit; fi
+	if [[ "$1" = "dev" ]]; then start devmgmt.msc & exit; fi
+	if [[ "$1" = "env" ]]; then rundll32.exe sysdm.cpl,EditEnvironmentVariables & exit; fi
+	if [[ "$1" = "evt" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\eventvwr.msc" & exit; fi
+	if [[ "$1" = "share" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\fsmgmt.msc" & exit; fi
+	if [[ "$1" = "svc" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\services.msc" & exit; fi
+	if [[ "$1" = "tsk" ]]; then
+		if [ -f %SYSTEMROOT%\SYSTEM32\taskschd.msc ]; then
+			start taskschd.msc & exit
+		  else
+		  	start control.exe schedtasks & exit
+		  fi
+	  fi
+	if [[ "$1" = "usr" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\lusrmgr.msc" & exit; fi
+
+	echo ""
+	echo Management Console Shell
+	echo Usage: mc [comp/dev/dns/env/evt/share/svc/tsk/usr]
+	#ad/dhcp/gp/hv/srv/wb/disk/
+	echo ""
+	}
+cmd_utils_env_pathadd(){ # pathadd
+	#add value to PATH
+	#ex1: . pathadd "%ODA_HOME%\bin"
+	#ex2: . pathadd c:\\app\\git\\cmd
+	#ex3: . pathadd 'c:\app\git\cmd'
+	#Warning: Use "." lunch syntax to use var immediately
+
+	[ $SHLVL -gt 1 ] && echo -e "${red}[PATHADD] Subshell can't change PATH after exit !${green} CORRECT USE: '. pathadd <path>'${norm}" 1>&2 && exit
+
+	NEWITEM=$1
+	if [[ "$NEWITEM" = "" ]]; then
+		echo "for msys will add path to user's Environment"
+		echo "for linux/osx will add to ~/.bash_profile"
+		echo "path ignored if already present"
+		echo "ex for msys:		. pathadd \"%PROJECT_HOME%\bin\""
+		echo "ex : 			. pathadd c:\\app\\git\\cmd"
+		echo "ex3: 			. pathadd 'c:\app\git\cmd'"
+		echo "ex for current path: 	. pathadd ."
+		exit
+	  fi
+		#echo "path is missed"
+		#pause
+		#return
+
+	#разделить path
+	if [ "$TERM" == "cygwin" ]; then
+		[[ "$NEWITEM" = "." ]] && NEWITEM=$(cmd //c "echo %CD%")
+		KEY="HKCU\Environment"
+		KEY_SYS="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+
+		PATH2=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g") # | sed "s/%\([^%;]\+\)%/$\U\1/g"
+		PATH_NEW=""
+		SAVEIFS=$IFS
+		IFS=';'
+		read -ra ARR <<< "$PATH2"
+
+		#по каждому item
+		for VALUE in "${ARR[@]}"; do
+			#echo $VALUE
+
+			#если совпадает то выйти
+			if [[ "$VALUE" = "$NEWITEM" ]]; then
+				echo already exists
+				pause
+				return
+			  fi
+			if [[ "$PATH_NEW" = "" ]]; then
+				PATH_NEW="$VALUE"
+			  else
+				PATH_NEW="$PATH_NEW;$VALUE"
+			  fi
+		  done
+		IFS=$SAVEIFS
+
+		PATH_NEW="$PATH_NEW;$NEWITEM"
+		#добавить new item
+		echo -e "\n"
+		echo OLD: $PATH2
+		echo --------------
+		echo NEW: $PATH_NEW
+		if [[ "$PATH_NEW" = "" ]]; then
+			echo "empty"
+			return
+		  fi
+		setx PATH "$PATH_NEW" > nul
+
+		#обновляем текущий PATH (сессии)
+		PATH_SYS=$(Reg.exe query "$KEY_SYS" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g" | sed "s/%\([^%;]\+\)%/$\U\1/g")
+		echo -e "\n"
+		#echo PATH_SYS: $PATH_SYS
+		PATH_NEW=$(echo "$PATH_NEW" | sed "s/%\([^%;]\+\)%/$\U\1/g")
+		PATH_CURR="$PATH_NEW;$PATH_SYS"
+		PATH_CURR=$(eval "echo \"$PATH_CURR \"")
+		PATH_CURR=${PATH_CURR//\\/\/}
+		#TODO: REPLACE C to $SYSTEMDRIVE
+		PATH_CURR=${PATH_CURR//C:/\/c}
+		PATH_CURR=${PATH_CURR//c:/\/c}
+		PATH_CURR=${PATH_CURR//;/:}
+		 #echo $PATH_CURR
+		PATH="$PATH_CURR"  # TODO: в PATH остаются проценты из PATH_NEW
+	  else
+	  	[[ "$NEWITEM" = "." ]] && NEWITEM=$(pwd) #
+	  	ARR=(`echo $PATH | tr ':' '\n'`)
+		for VALUE in "${ARR[@]}"; do
+			#echo $VALUE = $NEWITEM
+			if [[ "$VALUE" == "$NEWITEM" ]]; then
+				echo -e "${red}$NEWITEM already exists !${norm}"
+				#pause
+				return
+			  fi
+		  done
+		echo -e "\nexport PATH=\$PATH:$NEWITEM" >> ~/.bash_profile
+		PATH="$PATH:$NEWITEM"
+	  fi
+	export PATH
+	#echo -e "\n"
+
+	#echo $PATH
+	#$ODA_HOME/utils/pathlist
+
+	pathlist
+	}
+cmd_utils_env_pathdel(){ # pathdel
+	#cut value from PATH
+	#ex: . pathdel "%ODA_HOME%\bin"
+	#ex: . pathdel c:\\app\\git\\cmd
+	#Warning: Use "." lunch syntax to see var immediately
+
+	NEWITEM=$1
+	if [[ "$1" = "" ]]; then
+		echo "path is missed"
+		pause
+		return
+	  fi
+
+	KEY="HKCU\Environment" #user's path
+	KEY_SYS="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment" #system path
+
+	#разделить path
+	#Reg.exe query "HKCU\Environment" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g"
+	PATH2=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g") # | sed "s/%\([^%;]\+\)%/$\U\1/g"
+	PATH_NEW=""
+	SAVEIFS=$IFS
+	IFS=';'
+	read -ra ARR <<< "$PATH2"
+
+	#по каждому item
+	for VALUE in "${ARR[@]}"; do
+		#echo $VALUE
+		#если совпадает то удалить
+		if [[ ! "$VALUE" = "$NEWITEM" ]]; then
+			if [[ "$PATH_NEW" = "" ]]; then
+				PATH_NEW="$VALUE"
+			  else
+				PATH_NEW="$PATH_NEW;$VALUE"
+			  fi
+		  fi
+	  done
+	IFS=$SAVEIFS
+
+	#добавить new item
+	echo OLD: $PATH2
+	echo --------------
+	echo NEW: $PATH_NEW
+	if [[ "$PATH_NEW" = "" ]]; then
+		echo "PATH_NEW is empty"
+		return
+	  fi
+	setx PATH "$PATH_NEW" > nul
+
+	#PATH_NEW=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	#PATH_SYS=$(Reg.exe query "$KEY_SYS" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	PATH_SYS=$(Reg.exe query "$KEY_SYS" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g" | sed "s/%\([^%;]\+\)%/$\U\1/g")
+	#PATH_SYS=$(Reg.exe query "HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	#echo $PATH_SYS
+	PATH_NEW=$(echo "$PATH_NEW" | sed "s/%\([^%;]\+\)%/$\U\1/g")
+	PATH_CURR="$PATH_NEW;$PATH_SYS"
+	PATH_CURR=$(eval "echo \"$PATH_CURR \"")
+	PATH_CURR=${PATH_CURR//\\/\/}
+	#TODO: REPLACE C to $SYSTEMDRIVE
+	PATH_CURR=${PATH_CURR//C:/\/c}
+	PATH_CURR=${PATH_CURR//c:/\/c}
+	PATH_CURR=${PATH_CURR//;/:}
+	#echo $PATH_CURR
+	PATH="$PATH_CURR"
+	export PATH
+	pathlist
+	}
+cmd_utils_env_pathlist(){ # pathlist  paths  pathsys = pathlist sys # -  enlist values from system PATH to rows
+	#enlist values from user's PATH to rows
+	# parse ARGS:
+	shopt  -s  nocasematch
+	ALL=no
+	[[ "$1" = "sys" ]]  && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment" # if [[ "$1" = "SYS" ]]; then KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"; fi
+	[[ "$1" = "user" ]] && KEY="HKCU\Environment" # if [[ "$1" = "USER" ]]; then KEY="HKCU\Environment"; fi
+	[[ "$1" = "let" ]]  && reusable=true
+	[[ "$1" = "all" ]]  && ALL=yes
+	shift
+	[[ "$1" = "sys" ]]  && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+	[[ "$1" = "user" ]] && KEY="HKCU\Environment"
+	[[ "$1" = "let" ]]  && reusable=true
+	[[ "$1" = "all" ]]  && ALL=yes
+
+	case "$(uname -s)" in # os_type    ?? + host
+		CYGWIN*|MINGW*)
+			#echo $TERM
+			[[ "$KEY" = "" ]] && KEY="HKCU\Environment"
+
+			#Reg.exe query HKCU\\Environment -v PATH
+			#Reg.exe query $KEY -v PATH | grep PATH | sed -n 	"s/\([^[:blank:]]\+\)/\1/p" # "/.*/p"
+			#echo -n '    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\' | sed -n "s/^\([[:blank:]]\+[^[:blank:]]\+\)/\1/p"
+			#    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\
+			#echo -n '    PATH    REG_EXPAND_SZ    C:\app\RailsInstaller\Ruby2.1.0\' | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g"
+			#C:\app\RailsInstaller\Ruby2.1.0\
+
+			#echo ==$KEY==
+			#echo Reg.exe query $KEY -v PATH
+			#Reg.exe query "$KEY" -v PATH
+			PATH2=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+			if [[ "$ALL" = "yes" ]]; then
+				echo  --------------------------------------------------------------------------------
+				echo "$PATH2"
+				echo  --------------------------------------------------------------------------------
+			  fi
+
+			SAVEIFS=$IFS
+			IFS=';'
+			RES=
+			read -ra ARR <<< "$PATH2" #ARR=($PATH2) ??
+			for VALUE in "${ARR[@]}"; do
+				#echo $VALUE
+				if [ "$RES" = "" ]; then
+					[[ $reusable = "true" ]] && RES="pathadd '$VALUE'" || RES="$VALUE"
+				  else
+					[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "pathadd '$VALUE'") || RES=$(printf "%s\n%s" "$RES" "$VALUE")
+				  fi
+			  done
+			IFS=$SAVEIFS
+			;;
+		Darwin)
+			ARR=(`echo $PATH | tr ':' '\n'`)
+			RES= # current result with paths
+			for VALUE in "${ARR[@]}"; do
+				# echo $VALUE
+				if [ "$RES" = "" ]; then
+					if [[ $reusable = "true" ]]; then
+						RES="pathadd '$VALUE'"
+					  else
+					  	RES="$VALUE"
+					  fi
+				  else
+					if [[ $reusable = "true" ]]; then
+						RES=$(printf "%s\n%s" "$RES" "pathadd '$VALUE'")
+					  else
+					  	RES=$(printf "%s\n%s" "$RES" "$VALUE")
+					  fi
+				  fi
+			  done
+	  esac
+	echo "$RES" | sort #-f
+	}
+cmd_utils_env_pause(){ # pause
+	read -n1 -r -p "Press any key to continue..." key
+	}
+cmd_utils_env_show(){ # sho
+	#echo SHOW: $VIEWER
+	platform=$(uname -s) # with no arguments will name the operating system.  - Cygwin Darwin Linux FreeBSD  linux-gnu msys win32 WindowsNT SunOS->Solaris AIX
+	#http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
+	#echo $OSTYPE # darwin14
+	#platform=${OSTYPE//[0-9.]/} – ABach Sep 28 '11 at 21:47	 	
+	#case $OSTYPE in darwin*) echo I am a Mac ;; esac
+	#if [[ $OSTYPE == darwin* ]]; 
+	# [[ "$OSTYPE" == "linux-gnu" ]]; then
+	# [[ "$OSTYPE" == "darwin"* ]]; then
+	# [[ "$OSTYPE" == "cygwin" ]]; then        # POSIX compatibility layer and Linux environment emulation for Windows
+	# [[ "$OSTYPE" == "msys" ]]; then         # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+	# [[ "$OSTYPE" == "win32" ]]; then         # I'm not sure this can happen.
+	# [[ "$OSTYPE" == "freebsd"* ]]; then
+	#else        # Unknown.
+	#case "$OSTYPE" in
+	#  solaris*) echo "SOLARIS" ;;
+	#  darwin*)  echo "OSX" ;; 
+	#  linux*)   echo "LINUX" ;;
+	#  bsd*)     echo "BSD" ;;
+	#  *)        echo "unknown: $OSTYPE" ;;
+	#esac
+
+	if [[ -f $1 ]]; then
+		if [[ "$VIEWER" = "" ]]; then
+			[[ "$platform" == "Darwin" ]] && cat $1 #echo editor #
+			[[ "$platform" == "" ]] && start $1
+		  else
+			#echo "$EDITOR $1"
+			$VIEWER "$1"
+		  fi
+	  else
+	  	file=$(which $1 2>/dev/null)
+		#[[ "$platform" == "Cygwin" ]] && file=$(where $1 2>nul)
+	  	if [[ "$file" = "" ]]; then
+	  		echo FILE NOT FOUND. current path: $PWD
+	  	  else
+			#echo FILE: $file
+	  		if [[ "$VIEWER" = "" ]]; then
+				[[ "$platform" == "Darwin" ]] && cat $file
+				[[ "$platform" == "Cygwin" ]] && start $file
+			  else
+	  	  		#echo "$EDITOR $file"
+				$VIEWER "$file"
+			  fi
+			#sublime_text.exe
+			#$ED
+	  	  fi
+	  fi
+	}
+cmd_utils_env_today(){ # today
+	#print date/time in german format
+	TIMESTAMP=$(date +%Y-%m-%d\ %H:%M:%S)
+	echo $TIMESTAMP
+	}
+cmd_utils_env_varadd(){ # varadd
+	#add  var/value to permanent user's environment
+	#ex1: . varadd GOPATH "$USERPROFILE/go"
+	#ex2: . varadd GOPATH c:\\app\\go\\work
+	#ex2: . varadd GOPATH 'c:\app\go\work'
+
+	if [[ "$1" = "" ]]; then
+		echo 1st param VAR_NAME is absent !
+		exit
+	  fi
+	if [[ "$2" = "" ]]; then
+		echo 2nd param VAR_VALUE is absent !
+		exit;
+	  fi
+	VAR_NAME=$1
+	VAR_VALUE=$2
+
+	KEY="HKCU\Environment"
+
+	VAR_VALUE_OLD=
+	VAR_VALUE_OLD=$(Reg.exe query "$KEY" -v $VAR_NAME 2>nul | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	if [[ "$VAR_VALUE_OLD" != "" ]]; then
+		echo [OLD] $VAR_NAME: $VAR_VALUE_OLD
+	  fi
+
+	echo [NEW] $VAR_NAME: $VAR_VALUE
+	if [[ "$VAR_VALUE" = "" ]]; then
+		echo "VAR_VALUE is empty"
+		exit
+	  fi
+	#echo setx $VAR_NAME "$VAR_VALUE"
+	setx $VAR_NAME "$VAR_VALUE" >nul
+
+	export $VAR_NAME
+	}
+cmd_utils_env_varaddsys(){ # varaddsys
+	#add  var/value to permanent user's environment
+	#ex1: . varadd GOPATH "$USERPROFILE/go"
+	#ex2: . varadd GOPATH c:\\app\\go\\work
+	#ex2: . varadd GOPATH 'c:\app\go\work'
+
+	if [[ "$1" = "" ]]; then
+		echo 1st param VAR_NAME is absent !
+		exit
+	  fi
+	if [[ "$2" = "" ]]; then
+		echo 2nd param VAR_VALUE is absent !
+		exit;
+	  fi
+	VAR_NAME=$1
+	VAR_VALUE=$2
+
+	KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+
+	VAR_VALUE_OLD=
+	VAR_VALUE_OLD=$(Reg.exe query "$KEY" -v $VAR_NAME 2>nul | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	if [[ "$VAR_VALUE_OLD" != "" ]]; then
+		echo [OLD] $VAR_NAME: $VAR_VALUE_OLD
+	  fi
+
+	echo [NEW] $VAR_NAME: $VAR_VALUE
+	if [[ "$VAR_VALUE" = "" ]]; then
+		echo "VAR_VALUE is empty"
+		exit
+	  fi
+	#echo setx $VAR_NAME "$VAR_VALUE"
+	setx -m $VAR_NAME "$VAR_VALUE" > \dev\nul
+
+	export $VAR_NAME
+	}
+cmd_utils_env_vardel(){ # vardel
+	#cut  var from permanent user's environment
+	#ex.  vardel GOPATH
+
+	VAR_NAME=$1
+	if [[ "$1" = "" ]]; then
+		echo VAR_NAME param is absent !
+		exit
+	  fi
+
+	KEY="HKCU\Environment" #user's path
+
+	VAR_VALUE=$(Reg.exe query "$KEY" -v $VAR_NAME 2>nul | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	echo [OLD] $VAR_NAME: $VAR_VALUE
+
+	if [[ "$VAR_VALUE" = "" ]]; then
+		echo "VAR_VALUE is empty"
+		exit
+	  else
+		#echo cmd //C "'""reg delete $KEY /v $VAR_NAME /f""'"
+		eval "cmd //C 'reg delete $KEY /v $VAR_NAME /f '" > nul
+		#/f Выполнение удаления без запроса подтверждения.
+		export >nul
+	  fi
+	}
+cmd_utils_env_vars(){ # vars  varsys = vars sys # - enlist vars from permanent system environment in rows except PATH
+	# Enlist vars from permanent user's environment in rows except PATH
+	# ex.: DEBUG=true vars sys
+	# Warning: extra vars can be defined in ~/.bash_profile ex. by 'export EDITOR=/c/app/sublime/sublime_text.exe'
+	if [ "$platform" != "Cygwin" ]; then
+		export | egrep -v PATH | gsed -E "s/^declare -x (.+)=\"(.*)\"$/\1\\t'\2'/g" | column -t | LC_ALL='C' sort -f
+	  else
+
+		[[ "$DEBUG" = "" ]] && DEBUG="false"
+
+		msysvars=false
+		shopt -s nocasematch
+		[[ "$1" = "USER" ]] && KEY="HKCU\Environment"
+		[[ "$1" = "SYS" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+		[[ "$1" = "let" ]] && reusable=true
+		[[ "$1" = "msys" ]] && msysvars=true
+		shift
+		[[ "$1" = "USER" ]] && KEY="HKCU\Environment"
+		[[ "$1" = "SYS" ]] && KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
+		[[ "$1" = "let" ]] && reusable=true
+		[[ "$1" = "msys" ]] && msysvars=true
+
+		[[ "$KEY" = "" ]] && KEY="HKCU\Environment"
+
+		FTMP=`mktemp /tmp/tmp.XXXXXX`
+		[[ "$DEBUG" = "true" ]] && echo KEY:$KEY && echo $FTMP && echo "---------------"
+
+		if [[ "$msysvars" = "true" ]]; then
+			cat ~/.bash_profile | grep "export"
+		  else
+			Reg query "$KEY" > $FTMP	 # Reg query "HKCU\Environment"
+			#[[ "$DEBUG" = "true" ]] && cat $FTMP && echo "---------------"
+
+			VARS=$(cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2)
+			#[[ "$DEBUG" = "true" ]] && cat $FTMP | sed "s/[[:space:]]\+/\t/g" | tail --lines=+3 | cut -f2 && echo "---------------"
+
+			VALS=$(cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g")
+			#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g" && echo "---------------"
+
+			#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
+			#[[ "$DEBUG" = "true" ]] && echo $VARS && echo "---------------" && echo $VALS
+			#[[ "$DEBUG" = "true" ]] && cat $FTMP | tail --lines=+3 | sed -r "s/^[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.*)/\3/g"
+			SAVEIFS=$IFS
+			IFS=$'\n'
+			ARR1=($VARS)
+			ARR2=($VALS)
+			COUNT=${#ARR1[*]}
+			pad='                             '
+			#RES=
+			for (( IDX=0 ; IDX<COUNT; IDX++ )) do
+				#echo -n "${ARR1[$IDX]}"
+				PAD=$(printf '%20s' ${ARR1[$IDX]})
+				var=${ARR1[$IDX]}
+				val=${ARR2[$IDX]}
+				if [[ "$DEBUG" = "true" ]]; then
+					[[ $var != "PATH" ]] && echo "$var - $val" || echo "$var - <skipped>"
+				  fi
+				val=${val//\\/\/}
+				val=${val//\%/%%}
+				if [[ "$var" != "PATH" ]] && [[ "$var" != "TEMP" ]] && [[ "$var" != "TMP" ]]; then
+					# && val="<call pathlist instead>"
+					[[ "$reusable" = "true" ]] && ROW=$(printf "varadd $var '$val'") || ROW=$(printf "$var %s $val" "${pad:${#var}}")
+					#printf "$var %s $val \n" "${pad:${#var}}"
+					if [[ "$RES" = "" ]]; then
+						RES="$ROW"
+					  else
+					  	[[ $reusable = "true" ]] && RES=$(printf "%s\n%s" "$RES" "$ROW") || RES=$(printf "%s\n%s" "$RES	" "$ROW")
+					  fi
+				  fi
+				#echo -n $PAD
+				#echo -ne "\t"
+				#echo ${ARR2[$IDX]}
+			  done
+			IFS=$SAVEIFS
+			echo "$RES" > $FTMP #dd.tmp
+			cat $FTMP | sort -f
+			#rm dd.tmp
+			rm $FTMP
+		  fi
+	  fi
 	}

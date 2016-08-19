@@ -1,2 +1,0 @@
-#!/usr/bin/bash
-"c:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe" -command diff -path:"$1"

@@ -1,2 +1,0 @@
-#!/usr/bin/bash
-find $1 -name .git -prune -o -name "*" -type f -exec /bin/file {} \; | grep ASCII\\\|ISO-8859 | sed 's/\(.*\):.*/iconv -f CP1251 -t UTF-8 "\1" \> tmpfile \&\& mv tmpfile "\1"/'

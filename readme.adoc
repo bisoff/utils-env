@@ -55,3 +55,5 @@ if bash is not in PATH then:
 		 (defined tools: computer props, device managment, environment vars, event, shares, services, scheduled tasks, users & groups, password)
 - cfg-*		- save application config in user repo or set config from repo
 		  (defined: msysgit, sublime)
+- colors
+

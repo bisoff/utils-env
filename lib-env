@@ -5,12 +5,14 @@ UTILS_ENV_INCLUDE="utils-env-include"
 UTILS_ENV_ALIASES="utils-env-aliases"
 case "$UTILS_ENV_THE_OS" in
 	MINGW*)
-		UTILS_ENV_TIMESTAMP=`stat -c %y $HOME_UTILS_ENV/lib-git`
-		UTILS_ENV_ALIAS_TIMESTAMP=`stat -c %y $HOME/.utils-git/$UTILS_ENV_ALIASES`
+		UTILS_ENV_TIMESTAMP=`stat -c %y $HOME_UTILS_ENV/lib-env`
+		UTILS_ENV_ALIAS_TIMESTAMP=`stat -c %y $HOME/.utils-env/$UTILS_ENV_ALIASES`
+		UTILS_ENV_SED="sed"
 		;;
 	Darwin)
 		UTILS_ENV_TIMESTAMP=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME_UTILS_ENV/lib-env")
 		UTILS_ENV_ALIAS_TIMESTAMP=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME/.utils-env/$UTILS_ENV_ALIASES")
+		UTILS_ENV_SED="gsed"
 		;;
 	# linux??)
 		# UTILS_PRJ_SED_BACKUP=??
@@ -176,7 +178,7 @@ cmd_utils_env_ed(){ 			# ed
 		  fi
 	  else
 	  	[ "$1" != "" ] && file=$(which $1 2>/dev/null)
-		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && file=$(where $1 2>nul)
+		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && file=$(where $1 2>/dev/null)
 	  	if [[ "$1" != "" && "$file" = "" ]]; then
 	  		echo FILE NOT FOUND. current path: $PWD
 	  	  else
@@ -545,7 +547,7 @@ cmd_utils_env_show(){  			# show
 		  fi
 	  else
 	  	file=$(which $1 2>/dev/null)
-		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && file=$(where $1 2>nul)
+		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && file=$(where $1 2>/dev/null)
 	  	if [[ "$file" = "" ]]; then
 	  		echo FILE NOT FOUND. current path: $PWD
 	  	  else
@@ -587,7 +589,7 @@ cmd_utils_env_varadd(){  		# varadd
 	KEY="HKCU\Environment"
 
 	VAR_VALUE_OLD=
-	VAR_VALUE_OLD=$(Reg.exe query "$KEY" -v $VAR_NAME 2>nul | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	VAR_VALUE_OLD=$(Reg.exe query "$KEY" -v $VAR_NAME 2>/dev/null | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
 	if [[ "$VAR_VALUE_OLD" != "" ]]; then
 		echo [OLD] $VAR_NAME: $VAR_VALUE_OLD
 	  fi
@@ -649,7 +651,7 @@ cmd_utils_env_vardel(){ 		# vardel
 
 	KEY="HKCU\Environment" #user's path
 
-	VAR_VALUE=$(Reg.exe query "$KEY" -v $VAR_NAME 2>nul | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	VAR_VALUE=$(Reg.exe query "$KEY" -v $VAR_NAME 2>/dev/null | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
 	echo [OLD] $VAR_NAME: $VAR_VALUE
 
 	if [[ "$VAR_VALUE" = "" ]]; then
@@ -657,17 +659,17 @@ cmd_utils_env_vardel(){ 		# vardel
 		return
 	  else
 		#echo cmd //C "'""reg delete $KEY /v $VAR_NAME /f""'"
-		eval "cmd //C 'reg delete $KEY /v $VAR_NAME /f '" > nul
+		eval "cmd //C 'reg delete $KEY /v $VAR_NAME /f '" > /dev/null
 		#/f Выполнение удаления без запроса подтверждения.
-		export >nul
+		export >/dev/null
 	  fi
 	}
 cmd_utils_env_vars(){ # 		# vars  varsys = vars sys # - enlist vars from permanent system environment in rows except PATH
 	# Enlist vars from permanent user's environment in rows except PATH
 	# ex.: DEBUG=true vars sys
 	# Warning: extra vars can be defined in ~/.bash_profile ex. by 'export EDITOR=/c/app/sublime/sublime_text.exe'
-	if [ "$UTILS_ENV_THE_OS" != "Cygwin" ]; then
-		export | egrep -v PATH | gsed -E "s/^declare -x (.+)=\"(.*)\"$/\1\\t'\2'/g" | column -t | LC_ALL='C' sort -f
+	if [ "$UTILS_ENV_THE_OS" == "Darwin" ]; then
+		export | egrep -v PATH | $UTILS_ENV_SED -E "s/^declare -x (.+)=\"(.*)\"$/\1\\t'\2'/g" | column -t | LC_ALL='C' sort -f
 	  else
 
 		[[ "$DEBUG" = "" ]] && DEBUG="false"
@@ -745,6 +747,6 @@ cmd_utils_env_vars(){ # 		# vars  varsys = vars sys # - enlist vars from permane
 	}
 
 cmd_utils_env_sudo(){ #
-	echo "$1"
+	#echo "$1"
 	`winPath2msys $WINDIR`/System32/runas.exe /user:$USERNAME "$1" #%USERNAME% Administrator
 	}

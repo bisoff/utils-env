@@ -748,5 +748,19 @@ cmd_utils_env_vars(){ # 		# vars  varsys = vars sys # - enlist vars from permane
 
 cmd_utils_env_sudo(){ #
 	#echo "$1"
-	`winPath2msys $WINDIR`/System32/runas.exe /user:$USERNAME "$1" #%USERNAME% Administrator
+	sudo.bat $1
+	# C:\>foo\bar.cmd
+	# 	%0 = foo\bar.cmd
+	# 	%~f0 = C:\foo\bar.cmd
+	# 	%~d0 = C:
+	# 	%~p0 = \foo\
+	# 	%~n0 = bar
+
+	# echo set shell=CreateObject("Shell.Application") > vv.vbs #  > vv.vbs
+	# echo shell.ShellExecute "%~dpnx0",,"%CD%", "runas", 1 >> vv.vbs
+	# echo set shell=nothing >> vv.vbs
+
+	# start vv.vbs /realtime 
+	# timeout 1 /NOBREAK 
+	# del /Q vv.vbs 
 	}

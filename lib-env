@@ -1,12 +1,33 @@
 #!/bin/bash
-platform=$(uname -s)
+UTILS_ENV_TRACE=1
+UTILS_ENV_THE_OS=$(uname -s)
+UTILS_ENV_INCLUDE="utils-env-include"
+UTILS_ENV_ALIASES="utils-env-aliases"
+case "$UTILS_ENV_THE_OS" in
+	MINGW*)
+		UTILS_ENV_TIMESTAMP=`stat -c %y $HOME_UTILS_ENV/lib-git`
+		UTILS_ENV_ALIAS_TIMESTAMP=`stat -c %y $HOME/.utils-git/$UTILS_ENV_ALIASES`
+		;;
+	Darwin)
+		UTILS_ENV_TIMESTAMP=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME_UTILS_ENV/lib-env")
+		UTILS_ENV_ALIAS_TIMESTAMP=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME/.utils-env/$UTILS_ENV_ALIASES")
+		;;
+	# linux??)
+		# UTILS_PRJ_SED_BACKUP=??
+		# UTILS_PRJ_TIMESTAMP=??
+	*)
+		# fail !
+  esac
+alias log_print='[ "$UTILS_ENV_TRACE" == "1" ] && echo -e 1>&2 '
+
 winPath2msys() {
 	#"$( test "${1:1:1}" != : && echo $1 || echo $(echo /${1::1} | tr [A-Z] [a-z])${1:2} )" 
 	#p="$(echo $1 | tr '\\' '/')" 
 	#echo ${p%/}
 	local win_path=$1
 	win_path="${win_path//\\/\/}"
-	win_path="/${win_path/://}"
+	win_path="/${win_path/:/}"
+	echo $win_path
 	#printf "%s" "$1" | sed -r 's!(.):([\\\/].*)$!/\1\2!;s!\\!/!g'
 	}
 msysPath2win() {
@@ -16,15 +37,22 @@ msysPath2win() {
 cmd_utils_env_win2unix(){ # win2unix
 	# ex.: win2unix "*"
 	# echo "$1"
-	# TODO: detect * w/o ""  [[ "$2" != "" ]] && echo one param (mask) required && exit
+	# TODO: detect * w/o ""  [[ "$2" != "" ]] && echo one param (mask) required && return
 	sed -i '' 's/'$'\r''//' $1
 	}
 
-cmd_utils_env_uninstall(){ # e-remove
+cmd_utils_env_help(){
+	clear
+	#less -n -r $UTILS_PRJ_HOME/readme.clr
+	while IFS='' read -r line || [[ -n "$line" ]]; do
+		eval "echo -e \"$line\""
+	done < <(cat $HOME_UTILS_ENV/e-help.clr ) #| head -n 2
+	}
+cmd_utils_env_uninstall(){ 		# e-remove
 	null
 	}
 
-cmd_utils_env_ascii(){ # ascii
+cmd_utils_env_ascii(){ 			# ascii
 	for (( a=1; a<=0xF; a++ )) ; do
 		for (( b=0; b<=0xF; b++ )) ; do
 			#[[ $a -eq 0 ]] && code=`printf "%x" $b` 			# printf "%x " $b #echo -n "$b " #
@@ -43,10 +71,10 @@ cmd_utils_env_ascii(){ # ascii
 	#echo
 	done
 	}
-cmd_utils_env_cfg_diff() { # cfg-diff
+cmd_utils_env_cfg_diff() { 		# cfg-diff
 	"c:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe" -command diff -path:"$1"
 	}
-cmd_utils_env_colors(){ # colors
+cmd_utils_env_colors(){			# colors
 	# https://habrahabr.ru/post/119436/
 	# http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 
@@ -98,14 +126,14 @@ cmd_utils_env_colors(){ # colors
 	done
 	echo
 	}
-cmd_utils_env_cp-convert(){ # cp-convert
+cmd_utils_env_cp-convert(){ 		# cp-convert
 	# ! /usr/bin/bash
 	find $1 -name .git -prune -o -name "*" -type f -exec /bin/file {} \; | grep ASCII\\\|ISO-8859 | sed 's/\(.*\):.*/iconv -f CP1251 -t UTF-8 "\1" \> tmpfile \&\& mv tmpfile "\1"/'
 	}
-cmd_utils_env_cp_files(){ # cp-files
+cmd_utils_env_cp_files(){ 		# cp-files
 	find $1 -name .git -prune -o -name "*" -type f -exec /bin/file {} \;
 	}
-cmd_utils_env_docbook_register(){ # docbook-register
+cmd_utils_env_docbook_register(){ 	# docbook-register
 	set -e # Bail out if anything goes wrong
 	which -s brew # Make sure Homebrew and DocBook are present
 	docbook="$(brew --prefix docbook)"
@@ -117,12 +145,10 @@ cmd_utils_env_docbook_register(){ # docbook-register
 		xmlcatalog --noout --add "nextCatalog" "" "file://$catalog" /etc/xml/catalog
 	  done
 	}
-cmd_utils_env_ed(){ # ed
+cmd_utils_env_ed(){ 			# ed
 	echo EDITOR: $EDITOR
-	platform=$(uname -s) # with no arguments will name the operating system.  - Cygwin Darwin Linux FreeBSD  linux-gnu msys win32 WindowsNT SunOS->Solaris AIX
 	#http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
-	#echo $OSTYPE # darwin14
-	#platform=${OSTYPE//[0-9.]/} – ABach Sep 28 '11 at 21:47	 	
+	#UTILS_ENV_THE_OS=${OSTYPE//[0-9.]/} – ABach Sep 28 '11 at 21:47	 	
 	#case $OSTYPE in darwin*) echo I am a Mac ;; esac
 	#if [[ $OSTYPE == darwin* ]]; 
 	# [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -142,22 +168,22 @@ cmd_utils_env_ed(){ # ed
 
 	if [[ -f $1 ]]; then
 		if [[ "$EDITOR" = "" ]]; then
-			[[ "$platform" == "Darwin" ]] && vim $1 #echo editor #
-			[[ "$platform" == "" ]] && start $1
+			[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim $1 #echo editor #
+			[[ "$UTILS_ENV_THE_OS" == "" ]] && start $1
 		  else
 			#echo "$EDITOR $1"
 			"$EDITOR" "$1"
 		  fi
 	  else
 	  	[ "$1" != "" ] && file=$(which $1 2>/dev/null)
-		#[[ "$platform" == "Cygwin" ]] && file=$(where $1 2>nul)
+		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && file=$(where $1 2>nul)
 	  	if [[ "$1" != "" && "$file" = "" ]]; then
 	  		echo FILE NOT FOUND. current path: $PWD
 	  	  else
 			echo FILE: $file
 	  		if [[ "$EDITOR" = "" ]]; then
-				[[ "$platform" == "Darwin" ]] && vim $file
-				[[ "$platform" == "Cygwin" ]] && start $file
+				[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim $file
+				[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && start $file
 			  else
 	  	  		#echo "$EDITOR $file"
 	  	  		"$EDITOR" "$file"
@@ -167,7 +193,7 @@ cmd_utils_env_ed(){ # ed
 	  	  fi
 	  fi
 	}
-cmd_utils_env_fwsize(){ # fwsize
+cmd_utils_env_fwsize(){ 		# fwsize
 	SAVEIFS=$IFS
 	IFS=$(echo -en "\n\b");
 	FILES=($(ls -1 --color=none)) # --ignore='lav' --ignore='!*' --quoting-style=shell '' --quoting-style=c-""
@@ -189,33 +215,32 @@ cmd_utils_env_fwsize(){ # fwsize
 		ii=$[ii + 1]
 	  done
 	}
-cmd_utils_env_mc(){ # mc-w / mc  conflicts w/Midnight Commander 
-	# platform=$(uname -s)
-	#if [ "$platform" == "Cygwin" ]; then 
-		#[[ "$1" = "" ]] && start mmc.exe & exit
-		#	[[ "$1" = "ad" ]] && start dsac.exe & exit
-		#[[ "$1" = "comp" ]] && start compmgmt.msc & exit
-		#[[ "$1" = "dev" ]] && start devmgmt.msc & exit
-		#	[[  "$1" = "dhcp" ]] && start dhcpmgmt.msc & exit
-		#[[ "$1" = "disk" ]] && start diskmgmt.msc & exit
-		#[[ "$1" = "dns" ]] && start dnsmgmt.msc & exit
-		#[[ "$1" = "env" ]] && rundll32.exe sysdm.cpl,EditEnvironmentVariables & exit
-		#[[ "$1" = "evt" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\eventvwr.msc" & exit
-		#	[[ "$1" = "gp" ]] && start mmc.exe %SYSTEMROOT%\SYSTEM32\gpmc.msc & exit
-		#	[[ "$1" = "hv" ]] && start mmc.exe "%PROGRAMFILES%\Hyper-V\virtmgmt.msc" & exit
-		#	[[ "$1" = "srv" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\ServerManager.msc" & exit
-		#[[ "$1" = "share" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\fsmgmt.msc" & exit
-		#[[ "$1" = "svc" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\services.msc" & exit
+cmd_utils_env_mc(){ 			# mcw / mc - conflicts w/Midnight Commander 
+	#if [ "$UTILS_ENV_THE_OS" == "Cygwin" ]; then 
+		#[[ "$1" = "" ]] && start mmc.exe & return
+		#	[[ "$1" = "ad" ]] && start dsac.exe & return
+		#[[ "$1" = "comp" ]] && start compmgmt.msc & return
+		#[[ "$1" = "dev" ]] && start devmgmt.msc & return
+		#	[[  "$1" = "dhcp" ]] && start dhcpmgmt.msc & return
+		#[[ "$1" = "disk" ]] && start diskmgmt.msc & return
+		#[[ "$1" = "dns" ]] && start dnsmgmt.msc & return
+		#[[ "$1" = "env" ]] && rundll32.exe sysdm.cpl,EditEnvironmentVariables & return
+		#[[ "$1" = "evt" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\eventvwr.msc" & return
+		#	[[ "$1" = "gp" ]] && start mmc.exe %SYSTEMROOT%\SYSTEM32\gpmc.msc & return
+		#	[[ "$1" = "hv" ]] && start mmc.exe "%PROGRAMFILES%\Hyper-V\virtmgmt.msc" & return
+		#	[[ "$1" = "srv" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\ServerManager.msc" & return
+		#[[ "$1" = "share" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\fsmgmt.msc" & return
+		#[[ "$1" = "svc" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\services.msc" & return
 		#[[ "$1" = "tsk" ]]; then
 		#	[ -f %SYSTEMROOT%\SYSTEM32\taskschd.msc ]; then
-		#		start taskschd.msc & exit
+		#		start taskschd.msc & return
 		#	  else
-		#	  	start control.exe schedtasks & exit
+		#	  	start control.exe schedtasks & return
 		#	  fi
 		#  fi
-		#[[ "$1" = "pwd" ]] && start control.exe userpasswords2 & exit
-		#[[ "$1" = "usr" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\lusrmgr.msc" & exit
-		#	[[  "$1" = "wb" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\wbadmin.msc" & exit
+		#[[ "$1" = "pwd" ]] && start control.exe userpasswords2 & return
+		#[[ "$1" = "usr" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\lusrmgr.msc" & return
+		#	[[  "$1" = "wb" ]] && start mmc.exe "%SYSTEMROOT%\SYSTEM32\wbadmin.msc" & return
 		#
 		#echo ""
 		#echo Management Console Shell
@@ -223,20 +248,20 @@ cmd_utils_env_mc(){ # mc-w / mc  conflicts w/Midnight Commander
 		#echo ""
 	#  fi
 
-	if [[ "$1" = "comp" ]]; then start compmgmt.msc & exit; fi
-	if [[ "$1" = "dev" ]]; then start devmgmt.msc & exit; fi
-	if [[ "$1" = "env" ]]; then rundll32.exe sysdm.cpl,EditEnvironmentVariables & exit; fi
-	if [[ "$1" = "evt" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\eventvwr.msc" & exit; fi
-	if [[ "$1" = "share" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\fsmgmt.msc" & exit; fi
-	if [[ "$1" = "svc" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\services.msc" & exit; fi
+	if [[ "$1" = "comp" ]]; then start compmgmt.msc & return; fi
+	if [[ "$1" = "dev" ]]; then start devmgmt.msc & return; fi
+	if [[ "$1" = "env" ]]; then rundll32.exe sysdm.cpl,EditEnvironmentVariables & return; fi
+	if [[ "$1" = "evt" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\eventvwr.msc" & return; fi
+	if [[ "$1" = "share" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\fsmgmt.msc" & return; fi
+	if [[ "$1" = "svc" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\services.msc" & return; fi
 	if [[ "$1" = "tsk" ]]; then
 		if [ -f %SYSTEMROOT%\SYSTEM32\taskschd.msc ]; then
-			start taskschd.msc & exit
+			start taskschd.msc & return
 		  else
-		  	start control.exe schedtasks & exit
+		  	start control.exe schedtasks & return
 		  fi
 	  fi
-	if [[ "$1" = "usr" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\lusrmgr.msc" & exit; fi
+	if [[ "$1" = "usr" ]]; then start mmc.exe "%SYSTEMROOT%\SYSTEM32\lusrmgr.msc" & return; fi
 
 	echo ""
 	echo Management Console Shell
@@ -244,14 +269,14 @@ cmd_utils_env_mc(){ # mc-w / mc  conflicts w/Midnight Commander
 	#ad/dhcp/gp/hv/srv/wb/disk/
 	echo ""
 	}
-cmd_utils_env_pathadd(){ # pathadd
+cmd_utils_env_pathadd(){		# pathadd
 	#add value to PATH
 	#ex1: . pathadd "%ODA_HOME%\bin"
 	#ex2: . pathadd c:\\app\\git\\cmd
 	#ex3: . pathadd 'c:\app\git\cmd'
 	#Warning: Use "." lunch syntax to use var immediately
 
-	[ $SHLVL -gt 1 ] && echo -e "${red}[PATHADD] Subshell can't change PATH after exit !${green} CORRECT USE: '. pathadd <path>'${norm}" 1>&2 && exit
+	[ $SHLVL -gt 1 ] && echo -e "${red}[PATHADD] Subshell can't change PATH after return !${green} CORRECT USE: '. pathadd <path>'${norm}" 1>&2 && return
 
 	NEWITEM=$1
 	if [[ "$NEWITEM" = "" ]]; then
@@ -262,7 +287,7 @@ cmd_utils_env_pathadd(){ # pathadd
 		echo "ex : 			. pathadd c:\\app\\git\\cmd"
 		echo "ex3: 			. pathadd 'c:\app\git\cmd'"
 		echo "ex for current path: 	. pathadd ."
-		exit
+		return
 	  fi
 		#echo "path is missed"
 		#pause
@@ -308,7 +333,7 @@ cmd_utils_env_pathadd(){ # pathadd
 			echo "empty"
 			return
 		  fi
-		setx PATH "$PATH_NEW" > nul
+		setx PATH "$PATH_NEW" > /dev/null
 
 		#обновляем текущий PATH (сессии)
 		PATH_SYS=$(Reg.exe query "$KEY_SYS" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g" | sed "s/%\([^%;]\+\)%/$\U\1/g")
@@ -346,7 +371,7 @@ cmd_utils_env_pathadd(){ # pathadd
 
 	pathlist
 	}
-cmd_utils_env_pathdel(){ # pathdel
+cmd_utils_env_pathdel(){ 		# pathdel
 	#cut value from PATH
 	#ex: . pathdel "%ODA_HOME%\bin"
 	#ex: . pathdel c:\\app\\git\\cmd
@@ -392,7 +417,7 @@ cmd_utils_env_pathdel(){ # pathdel
 		echo "PATH_NEW is empty"
 		return
 	  fi
-	setx PATH "$PATH_NEW" > nul
+	setx PATH "$PATH_NEW" > /dev/null
 
 	#PATH_NEW=$(Reg.exe query "$KEY" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
 	#PATH_SYS=$(Reg.exe query "$KEY_SYS" -v PATH | grep PATH | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
@@ -412,7 +437,7 @@ cmd_utils_env_pathdel(){ # pathdel
 	export PATH
 	pathlist
 	}
-cmd_utils_env_pathlist(){ # pathlist  paths  pathsys = pathlist sys # -  enlist values from system PATH to rows
+cmd_utils_env_pathlist(){ 		# pathlist  paths  pathsys = pathlist sys # -  enlist values from system PATH to rows
 	#enlist values from user's PATH to rows
 	# parse ARGS:
 	shopt  -s  nocasematch
@@ -485,15 +510,14 @@ cmd_utils_env_pathlist(){ # pathlist  paths  pathsys = pathlist sys # -  enlist 
 	  esac
 	echo "$RES" | sort #-f
 	}
-cmd_utils_env_pause(){ # pause
+cmd_utils_env_pause(){ 			# pause
 	read -n1 -r -p "Press any key to continue..." key
 	}
-cmd_utils_env_show(){ # sho
+cmd_utils_env_show(){  			# show
 	#echo SHOW: $VIEWER
-	platform=$(uname -s) # with no arguments will name the operating system.  - Cygwin Darwin Linux FreeBSD  linux-gnu msys win32 WindowsNT SunOS->Solaris AIX
 	#http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
 	#echo $OSTYPE # darwin14
-	#platform=${OSTYPE//[0-9.]/} – ABach Sep 28 '11 at 21:47	 	
+	#UTILS_ENV_THE_OS=${OSTYPE//[0-9.]/} – ABach Sep 28 '11 at 21:47	 	
 	#case $OSTYPE in darwin*) echo I am a Mac ;; esac
 	#if [[ $OSTYPE == darwin* ]]; 
 	# [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -513,22 +537,22 @@ cmd_utils_env_show(){ # sho
 
 	if [[ -f $1 ]]; then
 		if [[ "$VIEWER" = "" ]]; then
-			[[ "$platform" == "Darwin" ]] && cat $1 #echo editor #
-			[[ "$platform" == "" ]] && start $1
+			[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && cat $1 #echo editor #
+			[[ "$UTILS_ENV_THE_OS" == "" ]] && start $1
 		  else
 			#echo "$EDITOR $1"
 			$VIEWER "$1"
 		  fi
 	  else
 	  	file=$(which $1 2>/dev/null)
-		#[[ "$platform" == "Cygwin" ]] && file=$(where $1 2>nul)
+		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && file=$(where $1 2>nul)
 	  	if [[ "$file" = "" ]]; then
 	  		echo FILE NOT FOUND. current path: $PWD
 	  	  else
 			#echo FILE: $file
 	  		if [[ "$VIEWER" = "" ]]; then
-				[[ "$platform" == "Darwin" ]] && cat $file
-				[[ "$platform" == "Cygwin" ]] && start $file
+				[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && cat $file
+				[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && start $file
 			  else
 	  	  		#echo "$EDITOR $file"
 				$VIEWER "$file"
@@ -538,12 +562,12 @@ cmd_utils_env_show(){ # sho
 	  	  fi
 	  fi
 	}
-cmd_utils_env_today(){ # today
+cmd_utils_env_today(){  		# today
 	#print date/time in german format
 	TIMESTAMP=$(date +%Y-%m-%d\ %H:%M:%S)
 	echo $TIMESTAMP
 	}
-cmd_utils_env_varadd(){ # varadd
+cmd_utils_env_varadd(){  		# varadd
 	#add  var/value to permanent user's environment
 	#ex1: . varadd GOPATH "$USERPROFILE/go"
 	#ex2: . varadd GOPATH c:\\app\\go\\work
@@ -551,11 +575,11 @@ cmd_utils_env_varadd(){ # varadd
 
 	if [[ "$1" = "" ]]; then
 		echo 1st param VAR_NAME is absent !
-		exit
+		return
 	  fi
 	if [[ "$2" = "" ]]; then
 		echo 2nd param VAR_VALUE is absent !
-		exit;
+		return;
 	  fi
 	VAR_NAME=$1
 	VAR_VALUE=$2
@@ -571,14 +595,14 @@ cmd_utils_env_varadd(){ # varadd
 	echo [NEW] $VAR_NAME: $VAR_VALUE
 	if [[ "$VAR_VALUE" = "" ]]; then
 		echo "VAR_VALUE is empty"
-		exit
+		return
 	  fi
 	#echo setx $VAR_NAME "$VAR_VALUE"
-	setx $VAR_NAME "$VAR_VALUE" >nul
+	setx $VAR_NAME "$VAR_VALUE" > /dev/null
 
 	export $VAR_NAME
 	}
-cmd_utils_env_varaddsys(){ # varaddsys
+cmd_utils_env_varaddsys(){ 		# varaddsys
 	#add  var/value to permanent user's environment
 	#ex1: . varadd GOPATH "$USERPROFILE/go"
 	#ex2: . varadd GOPATH c:\\app\\go\\work
@@ -586,11 +610,11 @@ cmd_utils_env_varaddsys(){ # varaddsys
 
 	if [[ "$1" = "" ]]; then
 		echo 1st param VAR_NAME is absent !
-		exit
+		return
 	  fi
 	if [[ "$2" = "" ]]; then
 		echo 2nd param VAR_VALUE is absent !
-		exit;
+		return;
 	  fi
 	VAR_NAME=$1
 	VAR_VALUE=$2
@@ -598,7 +622,7 @@ cmd_utils_env_varaddsys(){ # varaddsys
 	KEY="HKLM\SYSTEM\ControlSet001\Control\Session Manager\Environment"
 
 	VAR_VALUE_OLD=
-	VAR_VALUE_OLD=$(Reg.exe query "$KEY" -v $VAR_NAME 2>nul | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
+	VAR_VALUE_OLD=$(Reg.exe query "$KEY" -v $VAR_NAME 2> /dev/null | grep $VAR_NAME | sed "s/\([[:blank:]]\+[^[:blank:]]\+\)\{2\}[[:blank:]]\+\(.*\)/\2/g")
 	if [[ "$VAR_VALUE_OLD" != "" ]]; then
 		echo [OLD] $VAR_NAME: $VAR_VALUE_OLD
 	  fi
@@ -606,21 +630,21 @@ cmd_utils_env_varaddsys(){ # varaddsys
 	echo [NEW] $VAR_NAME: $VAR_VALUE
 	if [[ "$VAR_VALUE" = "" ]]; then
 		echo "VAR_VALUE is empty"
-		exit
+		return
 	  fi
 	#echo setx $VAR_NAME "$VAR_VALUE"
-	setx -m $VAR_NAME "$VAR_VALUE" > \dev\nul
+	cmd_utils_env_sudo "setx -m $VAR_NAME $VAR_VALUE" #> /dev/null
 
 	export $VAR_NAME
 	}
-cmd_utils_env_vardel(){ # vardel
+cmd_utils_env_vardel(){ 		# vardel
 	#cut  var from permanent user's environment
 	#ex.  vardel GOPATH
 
 	VAR_NAME=$1
 	if [[ "$1" = "" ]]; then
 		echo VAR_NAME param is absent !
-		exit
+		return
 	  fi
 
 	KEY="HKCU\Environment" #user's path
@@ -630,7 +654,7 @@ cmd_utils_env_vardel(){ # vardel
 
 	if [[ "$VAR_VALUE" = "" ]]; then
 		echo "VAR_VALUE is empty"
-		exit
+		return
 	  else
 		#echo cmd //C "'""reg delete $KEY /v $VAR_NAME /f""'"
 		eval "cmd //C 'reg delete $KEY /v $VAR_NAME /f '" > nul
@@ -638,11 +662,11 @@ cmd_utils_env_vardel(){ # vardel
 		export >nul
 	  fi
 	}
-cmd_utils_env_vars(){ # vars  varsys = vars sys # - enlist vars from permanent system environment in rows except PATH
+cmd_utils_env_vars(){ # 		# vars  varsys = vars sys # - enlist vars from permanent system environment in rows except PATH
 	# Enlist vars from permanent user's environment in rows except PATH
 	# ex.: DEBUG=true vars sys
 	# Warning: extra vars can be defined in ~/.bash_profile ex. by 'export EDITOR=/c/app/sublime/sublime_text.exe'
-	if [ "$platform" != "Cygwin" ]; then
+	if [ "$UTILS_ENV_THE_OS" != "Cygwin" ]; then
 		export | egrep -v PATH | gsed -E "s/^declare -x (.+)=\"(.*)\"$/\1\\t'\2'/g" | column -t | LC_ALL='C' sort -f
 	  else
 
@@ -718,4 +742,9 @@ cmd_utils_env_vars(){ # vars  varsys = vars sys # - enlist vars from permanent s
 			rm $FTMP
 		  fi
 	  fi
+	}
+
+cmd_utils_env_sudo(){ #
+	echo "$1"
+	`winPath2msys $WINDIR`/System32/runas.exe /user:$USERNAME "$1" #%USERNAME% Administrator
 	}

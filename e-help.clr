@@ -1,0 +1,19 @@
+${cyan}Environment tools${norm}
+  ${yellow}var*${norm} 		- add, drop and enlist (sorted) environment variables in user's context
+  ${yellow}path*${norm}		- add, drop and enlist (sorted) pathes in PATH variable (add/drop in user's context, enlist in user, system and commin context)
+
+${cyan}File system${norm}
+  ${yellow}cp-files${norm}	- enlist file type of files in path, passed in param (used to define code page of plain text files)
+  ${yellow}cp-convert${norm}	- converts to UTF-8 plain text files, with type ANSI-8859 (path passed in param)
+				  used to store CP1251 files in git repo with auto detect code page feature
+  ${yellow}fget${norm}		- a la wget by powershell
+  ${yellow}fwsize${norm}	- enlist subfolders size in kb
+
+${cyan}Other${norm}
+  ${yellow}today${norm}		- print to stdout today with time in German format for current timezone
+  ${yellow}pause${norm}		- a la windows
+  ${yellow}ed${norm}		- edit file in current path or any shell-script file in \$PATH; (\$EDITOR - path to editor, setuped in ~/.bash_profile); file lookuped in PATH by 'where|which' command
+  ${yellow}mcw${norm}		- open windows management tool from CLI
+		 		  (defined tools: computer props, device managment, environment vars, event, shares, services, scheduled tasks, users & groups, password)
+  ${yellow}cfg-*${norm}		- save application config in user repo or set config from repo   (defined: msysgit, sublime)
+  ${yellow}colors${norm}	- 

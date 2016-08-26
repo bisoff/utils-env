@@ -748,6 +748,7 @@ cmd_utils_env_vars(){ # 		# vars  varsys = vars sys # - enlist vars from permane
 
 cmd_utils_env_sudo(){ #
 	#echo "$1"
+	# setx -m ERROR: Access to the registry path is denied.
 	sudo.bat $1
 	# C:\>foo\bar.cmd
 	# 	%0 = foo\bar.cmd

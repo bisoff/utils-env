@@ -793,7 +793,22 @@ cmd_utils_env_vars(){ # 		# vars  varsys = vars sys # - enlist vars from permane
 cmd_utils_env_sudo(){ #
 	#echo "$1"
 	# setx -m ERROR: Access to the registry path is denied.
-	sudo.bat $1
+	local cmd=`msysPath2win $1`
+	[ "$1" == "cmd_utils_env_ed" ] && cmd=$(msysPath2win `which vim`) #cmd='c:/Program Files/Sublime Text 3/sublime_text.exe' #cmd=$(msysPath2win `which $EDITOR`)
+	shift
+	args=`msysPath2win "$*"`
+
+	echo "Set objShell = CreateObject(\"Shell.Application\")" >  $TEMP/sudo.tmp.vbs
+	#echo "args = Right(\"%*\", (Len(\"%*\") - Len(\"%~1\")))" >> $TEMP/sudo.tmp.vbs
+	echo "objShell.ShellExecute \"$cmd\", \"$args\", \"\", \"runas\"" >> $TEMP/sudo.tmp.vbs
+	#echo "WScript.Echo ()" >> $TEMP/sudo.tmp.vbs
+	#echo "z = WScript.StdIn.Read(1)" >> $TEMP/sudo.tmp.vbs
+	echo `msysPath2win $TEMP/sudo.tmp.vbs`
+	cat "$TEMP/sudo.tmp.vbs"
+	cscript `msysPath2win $TEMP/sudo.tmp.vbs`
+	#rm $TEMP/sudo.tmp.vbs
+
+	#sudo.bat $1
 	# C:\>foo\bar.cmd
 	# 	%0 = foo\bar.cmd
 	# 	%~f0 = C:\foo\bar.cmd

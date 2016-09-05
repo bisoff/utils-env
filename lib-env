@@ -24,7 +24,7 @@ alias log_print='[ "$UTILS_ENV_TRACE" == "1" ] && echo -e 1>&2 '
 
 cmd_utils_env_wrapper(){
 	local cmd_one="$1"
-
+	#echo "cmd_one: $cmd_one"
 	local utils_env_timestamp_current
 	case "$UTILS_ENV_THE_OS" in
 		MINGW*)
@@ -61,7 +61,7 @@ cmd_utils_env_wrapper(){
 		shift
 	done
 	#echo "params: $params"
-	eval $cmd_one "$params" #"$@*"
+	eval "$cmd_one" "$params" #"$@*"
 	UTILS_PRJ_TRACE=0
 	}
 

@@ -824,3 +824,12 @@ cmd_utils_env_sudo(){ #
 	# timeout 1 /NOBREAK 
 	# del /Q vv.vbs 
 	}
+cmd_utils_env_add_path(){
+	case ":$PATH:" in
+	  $1:*) ;;			# do nothing if $PATH already contains $1
+	  *:$1) ;;			# do nothing if $PATH already contains $1
+	  *:$1:*) ;;			# do nothing if $PATH already contains $1
+	  *) PATH=$1:$PATH ;;  # in every other case, add it to the front
+	esac
+	echo $PATH
+	}

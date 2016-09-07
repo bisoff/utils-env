@@ -5,13 +5,13 @@ UTILS_ENV_INCLUDE="utils-env-include"
 UTILS_ENV_ALIASES="utils-env-aliases"
 case "$UTILS_ENV_THE_OS" in
 	MINGW*)
-		UTILS_ENV_TIMESTAMP=`stat -c %y $HOME_UTILS_ENV/lib-env`
-		UTILS_ENV_ALIAS_TIMESTAMP=`stat -c %y $HOME/.utils-env/$UTILS_ENV_ALIASES`
+		UTILS_ENV_TIMESTAMP=`stat -f "%Sm" -t "%F %T" $HOME_UTILS_ENV/lib-env`
+		UTILS_ENV_ALIAS_TIMESTAMP=`stat -f "%Sm" -t "%F %T" $HOME/.utils-env/$UTILS_ENV_ALIASES`
 		UTILS_ENV_SED="sed"
 		;;
 	Darwin)
-		UTILS_ENV_TIMESTAMP=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME_UTILS_ENV/lib-env")
-		UTILS_ENV_ALIAS_TIMESTAMP=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME/.utils-env/$UTILS_ENV_ALIASES")
+		UTILS_ENV_TIMESTAMP=$(stat -f "%Sm" -t "%F %T" "$HOME_UTILS_ENV/lib-env")
+		UTILS_ENV_ALIAS_TIMESTAMP=$(stat -f "%Sm" -t "%F %T" "$HOME/.utils-env/$UTILS_ENV_ALIASES")
 		UTILS_ENV_SED="gsed"
 		;;
 	# linux??)
@@ -20,6 +20,7 @@ case "$UTILS_ENV_THE_OS" in
 	*)
 		# fail !
   esac
+source "$HOME/.utils-env/$UTILS_ENV_ALIASES"
 alias log_print='[ "$UTILS_ENV_TRACE" == "1" ] && echo -e 1>&2 '
 
 cmd_utils_env_wrapper(){
@@ -28,20 +29,23 @@ cmd_utils_env_wrapper(){
 	local utils_env_timestamp_current
 	case "$UTILS_ENV_THE_OS" in
 		MINGW*)
-			utils_env_timestamp_current=`stat -c %y $HOME_UTILS_ENV/lib-env`
-			utils_env_alias_timestamp_current=`stat -c %y $HOME/.utils-env/$UTILS_ENV_ALIASES`
+			utils_env_timestamp_current=`stat -f "%Sm" -t "%F %T" $HOME_UTILS_ENV/lib-env`
+			utils_env_alias_timestamp_current=`stat -f "%Sm" -t "%F %T" $HOME/.utils-env/$UTILS_ENV_ALIASES`
 			;;
 		Darwin)
-			utils_env_timestamp_current=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME_UTILS_ENV/lib-env")
-			utils_env_alias_timestamp_current=$(stat -f "%Sm" -t "%h %U %G %s" "$HOME/.utils-env/$UTILS_ENV_ALIASES")
+			utils_env_timestamp_current=$(stat -f "%Sm" -t "%F %T" "$HOME_UTILS_ENV/lib-env")
+			utils_env_alias_timestamp_current=$(stat -f "%Sm" -t "%F %T" "$HOME/.utils-env/$UTILS_ENV_ALIASES")
 			;;
 		# linux??)
 			# UTILS_ENV_TIMESTAMP=??
 		*)
 			# fail !
 	  esac
-	#echo -e "utils_env_timestamp_current:\t$utils_env_timestamp_current"
-	#echo -e "UTILS_ENV_TIMESTAMP:\t\t$UTILS_ENV_TIMESTAMP"
+	echo -e "utils_env_timestamp_current:\t\t$utils_env_timestamp_current"
+	echo -e "UTILS_ENV_TIMESTAMP:\t\t\t$UTILS_ENV_TIMESTAMP"
+
+	echo -e "utils_env_alias_timestamp_current:\t$utils_env_alias_timestamp_current"
+	echo -e "UTILS_ENV_ALIAS_TIMESTAMP:\t\t$UTILS_ENV_ALIAS_TIMESTAMP"
 
 	[ "$utils_env_timestamp_current" != "$UTILS_ENV_TIMESTAMP" ] && echo "Updating commands..." && source "$HOME_UTILS_ENV/lib-env"
 	[ "$utils_env_alias_timestamp_current" != "$UTILS_ENV_ALIAS_TIMESTAMP" ] && echo "Updating aliases..." && source "$HOME/.utils-env/$UTILS_ENV_ALIASES"
@@ -60,8 +64,9 @@ cmd_utils_env_wrapper(){
 		  esac
 		shift
 	done
-	#echo "params: $params"
-	eval "$cmd_one" "$params" #"$@*"
+	#echo "cmd_one: $cmd_one"
+	#echo "params:  $params"
+	eval $cmd_one $params #"$@*"
 	UTILS_PRJ_TRACE=0
 	}
 
@@ -118,6 +123,8 @@ cmd_utils_env_ed(){ 			# ed
 	#  *)        echo "unknown: $OSTYPE" ;;
 	#esac
 
+	fileToEdit="$1"
+	echo "FILE: '$fileToEdit'"
 	if [[ -f $1 ]]; then
 		if [[ "$EDITOR" = "" ]]; then
 			[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim $1 #echo editor #
@@ -127,18 +134,18 @@ cmd_utils_env_ed(){ 			# ed
 			"$EDITOR" "$1"
 		  fi
 	  else
-	  	[ "$1" != "" ] && file=$(which $1 2>/dev/null)
-		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && file=$(where $1 2>/dev/null)
-	  	if [[ "$1" != "" && "$file" = "" ]]; then
-	  		echo -e "FILE NOT FOUND\n    file: $1\n    path: $PWD"
+	  	[ "$fileToEdit=" != "" ] && fileToEdit=$(which $1 2>/dev/null)
+		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && fileToEdit=$(where $1 2>/dev/null)
+	  	if [[ "$1" != "" && "$fileToEdit" = "" ]]; then
+	  		echo -e "FILE NOT FOUND\n    fileToEdit: $1\n    path: $PWD"
 	  	  else
-			echo FILE: $file
+			echo FILE: $fileToEdit
 	  		if [[ "$EDITOR" = "" ]]; then
-				[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim $file
-				[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && start $file
+				[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim $fileToEdit
+				[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && start $fileToEdit
 			  else
 	  	  		#echo "$EDITOR $file"
-	  	  		"$EDITOR" "$file"
+	  	  		"$EDITOR" "$fileToEdit"
 			  fi
 			#sublime_text.exe
 			#$ED
@@ -169,59 +176,135 @@ cmd_utils_env_cfg_diff() { 		# cfg-diff
 	"c:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe" -command diff -path:"$1"
 	}
 cmd_utils_env_colors(){			# colors
+	clear
+	echo
 	# https://habrahabr.ru/post/119436/
 	# http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+	# http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf
+	# https://en.wikipedia.org/wiki/ANSI_escape_code
 
-	# Foreground Colours
-	#30 Black
-	#31 Red
-	#32 Green
-	#33 Yellow
-	#34 Blue
-	#35 Magenta
-	#36 Cyan
-	#37 White
+	# ECMA-48
+	# VT100
+	# CSI - Control Sequence Introducer (Control Sequence Initiator)
+	# SGR - Select Graphic Rendition
+	# 	[mode chars] SGR-1 [;SGR-2 [; ...]] m
+	#	Если значения SGR не указаны, то по умолчанию обычно используются 0 или 1, в зависимости от операции
+	# 	0 	Reset / Normal 			выключение всех атрибутов
+	# 	1 	Bright				Жирный или увеличить яркость 	
+	# 	2 	Dim				бледный Блёклый (уменьшить яркость) Не везде поддерживается
+	# 	3 	Italic 				Курсив.  Не везде поддерживается. Иногда обрабатывается как инверсия.
+	# 	4 	Subscribe			Подчеркнутый один раз 	
+	# 	5 	Мигание: Медленно 		менее 150 раз в минуту
+	# 	6 	Мигание: Часто 			MS-DOS ANSI.SYS; 150+ в минуту; не везде поддерживается
+	# 	7 	Отображение: Негатив 		инвертирует или обращает; меняет цвета фона и текста
+	# 	8 	Скрытый 			Не везде поддерживается     Hidden  Concealed   спрятанный
+	# 	9 	Зачеркнутый 			Символы разборчивы, но помечены как удаленные. Не везде поддерживается.
 
-	# Background Colours
-	#40 Black
-	#41 Red
-	#42 Green
-	#43 Yellow
-	#44 Blue
-	#45 Magenta
-	#46 Cyan
-	#47 White
+	# 	10 	Основной(по умолчанию) шрифт 	
+	# 	11–19	альтернативный шрифт 		(14 - четвертый альтернативный шрифт, 19 - 9й альтернативный шрифт)
 
-	#0  Reset all attributes
-	#1  Bright
-	#2  Dim
-	#4  Underscore  
-	  #5  Blink
-	#7  Reverse
-	  #8  Hidden
-	for a in 2 0 1 4 7 5; do  # 5 8
-	      [ $a -eq 2 ] && echo "Dim (2):" 
-	      [ $a -eq 0 ] && echo "Norm (0-reset):" 
-	      [ $a -eq 4 ] && echo "Underscore (4):" 
-	      [ $a -eq 1 ] && echo "Bright (1):" 
-	      [ $a -eq 7 ] && echo "Reverse (7):" 
-	      [ $a -eq 5 ] && echo "Blink (5):" 
-	      for (( f=1; f<=9; f++ )) ; do # #f in 1 8 9
-	              # 
-	              for b in 0 8 9 ; do # (( b=0; b<=9; b++ )); do # 1-7: background
-	                      #echo -ne "f=$f b=$b" 
-	                      echo -ne "\\033[${a};3${f};4${b}m"
-	                      echo -ne "\\\\\\\\033[${a};3${f};4${b}m"
-	                      echo -ne "\\033[0m "
-	              done
-	      echo
-	      done
-	      #echo
-	done
+	# 	30–37 	Установить цвет текста 		30 + n, где n из таблицы цветов -  0..7 - Black Red Green Yellow  Blue Magenta Cyan White
+	# 	40–47 	Установить цвет фона 		40 + n, где n из таблицы цветов
+	# 	39 	Цвет текста по умолчанию (на переднем плане) 	зависит от реализации (в соответствии со стандартом)
+	# 	49 	Цвет фона по умолчанию 	зависит от реализации (в соответствии со стандартом)
+	# 	38 	доп цвета		 	обычно поддерживаются следующие аргументы: 
+	#							5;n 	где n индекс цвета (0..255)  или 
+	#							2;r;g;b где r,g,b - красный, зеленый и синий  каналы цвета (в пределах 255)
+	# 	48 	расширенный цвет фона 		обычно поддерживает следующие аргументы 
+	#							5;n где n индекс цвета (0..255) или 
+	#							2;r;g;b where r,g,b - красный, зеленый и синий каналы цвета (в пределах 255)
+
+	# 	20 	Фрактура 			вряд ли поддерживается
+
+	# 	21 	Жирный-выкл | Dbl Subcr 	жирный не всегда поддерживается; двойное подчеркивание вряд ли поддерживается.
+	# 	22 	Обычный цвет или яркость 	Ни жирный ни блеклый
+	# 	23 	курсивный выкл, фрактура выкл 	
+	# 	24 	Подчеркивание: выкл 		Подчеркивание ни одиночное ни двойное
+	# 	25 	Мигание: выкл. 	
+	# 	27 	Отображение: обычное 		не негатив
+	# 	28 	Отображающийся 			выключить скрытие
+	# 	29 	зачеркнутый выкл
+	
+	# 	51 	Обрамленный 	
+	# 	52 	Окруженный 	
+	# 	53 	Надчеркнутый
+	cname=("Black" "Red" "Green" "Yellow" "Blue"  "Magenta" "Cyan" "White") # color name
+	mode=("Normal"   "Bold" "Faint" "Italic" "Subscribe" "Blink"  "BlinkRapid" "Inverse" "Conceal", "Crossed-out") # Faint = Dim
+	mode_normal=0
+	mode_bold=1
+	mode_faint=2
+	mode_subscribe=4
+	mode_blink=5
+	mode_inverse=7
+	color_black=0
+	color_red=1
+	color_green=2
+	color_yellow=3
+	color_blue=4
+	color_magenta=5
+	color_cyan=6
+	color_white=7
+	#echo "1 ${cname[1]}"
+	#echo "2 ${cname[2]}"
+
+	# character ESC  =  ASCII decimal 27  =  hex 0x1B  = octal 033   
+	for imode in 0 1 2 4 5 7; do   # 3 8 6 - not supportd
+		#echo imode: $imode
+		#cmd_utils_env_show_color $imode 31 40 # 40:black
+		#cmd_utils_env_show_color 1 31 40 # 40:black
+		#echo 
+		for (( icolor=1; icolor<=7; icolor++ )) ; do  # foreground color
+			cmd_utils_env_show_color $imode "3$icolor" 40 # 40:black
+			cmd_utils_env_show_color $imode 30 "4$icolor" # 30:black
+
+			#echo -ne "$reset_all"
+			echo -ne "${grey} "
+			echo -n "${mode[$imode]} ($imode) - "
+			echo -e "${cname[$icolor]} (3$icolor) on ${cname[0]} (40)  and  ${cname[0]} (30) on ${cname[$icolor]} (4$icolor) $reset_all "
+		  done
+		echo
+	  done
+	cmd_utils_env_show_color 0 38 40
+	echo
+	esc='\033'
+	eesc='\\033'
+	reset_all="$esc[0m"
+	color=$color_white
+	echo -ne "$esc[$mode_bold;3$color;40m"  # $mode_bold$mode_blink;
+	echo -ne "$eesc[$mode_bold;3$color;40m $reset_all"  # 
+	echo
+	echo -ne "$esc[$mode_normal;3$color;40m"
+	echo -ne "$eesc[$mode_normal;3$color;40m $reset_all"
 	echo
 	}
+cmd_utils_env_colors_255(){		# xcolors
+	for (( icolor=0; icolor<=255; icolor++ )) ; do
+		cmd_utils_env_show_ext_color $icolor
+		echo
+	  done
+	}
+cmd_utils_env_show_color(){ 		# 
+	local mode="$1"
+	local foreground="$2"
+	local background="$3"
+	local esc='\033'
+	reset_all="$esc[0m"
+	#local reset_all="$esc[0"
+	#reset_all="$esc[39;49;21;22;23;24;25;27"
+	echo -ne "$esc[$mode;$foreground;${background}m"  # 31-red..37-white  38-reset
+	echo -n $esc
+	echo -ne "[$mode;$foreground;${background}m $reset_all"
+	}
+cmd_utils_env_show_ext_color(){ 		# 
+	local color="$1"
+	local esc='\033'
+	local reset_all="$esc[0m"
+	echo -ne "$esc[0;38;5;$color;40m"  # 31-red..37-white  38-reset
+	echo -n $esc
+	echo -ne "[0;38;5;$color;40m $reset_all"
+	}
+
 cmd_utils_env_cp-convert(){ 		# cp-convert
-	# ! /usr/bin/bash
 	find $1 -name .git -prune -o -name "*" -type f -exec /bin/file {} \; | grep ASCII\\\|ISO-8859 | sed 's/\(.*\):.*/iconv -f CP1251 -t UTF-8 "\1" \> tmpfile \&\& mv tmpfile "\1"/'
 	}
 cmd_utils_env_cp_files(){ 		# cp-files

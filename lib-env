@@ -204,15 +204,14 @@ cmd_utils_env_colors(){			# colors
 	# 	11–19	альтернативный шрифт 		(14 - четвертый альтернативный шрифт, 19 - 9й альтернативный шрифт)
 
 	# 	30–37 	Установить цвет текста 		30 + n, где n из таблицы цветов -  0..7 - Black Red Green Yellow  Blue Magenta Cyan White
-	# 	40–47 	Установить цвет фона 		40 + n, где n из таблицы цветов
+	# 	38 	доп цвета		 	обычно поддерживаются следующие аргументы: 5;n 	где n индекс цвета (0..255)  или  2;r;g;b где r,g,b - красный, зеленый и синий  каналы цвета (в пределах 255)
 	# 	39 	Цвет текста по умолчанию (на переднем плане) 	зависит от реализации (в соответствии со стандартом)
-	# 	49 	Цвет фона по умолчанию 	зависит от реализации (в соответствии со стандартом)
-	# 	38 	доп цвета		 	обычно поддерживаются следующие аргументы: 
-	#							5;n 	где n индекс цвета (0..255)  или 
-	#							2;r;g;b где r,g,b - красный, зеленый и синий  каналы цвета (в пределах 255)
+
+	# 	40–47 	Установить цвет фона 		40 + n, где n из таблицы цветов
 	# 	48 	расширенный цвет фона 		обычно поддерживает следующие аргументы 
 	#							5;n где n индекс цвета (0..255) или 
 	#							2;r;g;b where r,g,b - красный, зеленый и синий каналы цвета (в пределах 255)
+	# 	49 	Цвет фона по умолчанию 	зависит от реализации (в соответствии со стандартом)
 
 	# 	20 	Фрактура 			вряд ли поддерживается
 
@@ -277,12 +276,6 @@ cmd_utils_env_colors(){			# colors
 	echo -ne "$eesc[$mode_normal;3$color;40m $reset_all"
 	echo
 	}
-cmd_utils_env_colors_255(){		# xcolors
-	for (( icolor=0; icolor<=255; icolor++ )) ; do
-		cmd_utils_env_show_ext_color $icolor
-		echo
-	  done
-	}
 cmd_utils_env_show_color(){ 		# 
 	local mode="$1"
 	local foreground="$2"
@@ -294,6 +287,12 @@ cmd_utils_env_show_color(){ 		#
 	echo -ne "$esc[$mode;$foreground;${background}m"  # 31-red..37-white  38-reset
 	echo -n $esc
 	echo -ne "[$mode;$foreground;${background}m $reset_all"
+	}
+cmd_utils_env_colors_255(){		# xcolors
+	for (( icolor=0; icolor<=255; icolor++ )) ; do
+		cmd_utils_env_show_ext_color $icolor
+		echo
+	  done
 	}
 cmd_utils_env_show_ext_color(){ 		# 
 	local color="$1"

@@ -1,5 +1,5 @@
 #!/bin/bash
-UTILS_ENV_TRACE=1
+UTILS_ENV_TRACE=0
 UTILS_ENV_THE_OS=$(uname -s)
 UTILS_ENV_INCLUDE="utils-env-include"
 UTILS_ENV_ALIASES="utils-env-aliases"
@@ -41,11 +41,11 @@ cmd_utils_env_wrapper(){
 		*)
 			# fail !
 	  esac
-	echo -e "utils_env_timestamp_current:\t\t$utils_env_timestamp_current"
-	echo -e "UTILS_ENV_TIMESTAMP:\t\t\t$UTILS_ENV_TIMESTAMP"
+	log_print "utils_env_timestamp_current:\t\t$utils_env_timestamp_current"
+	log_print "UTILS_ENV_TIMESTAMP:\t\t\t$UTILS_ENV_TIMESTAMP"
 
-	echo -e "utils_env_alias_timestamp_current:\t$utils_env_alias_timestamp_current"
-	echo -e "UTILS_ENV_ALIAS_TIMESTAMP:\t\t$UTILS_ENV_ALIAS_TIMESTAMP"
+	log_print "utils_env_alias_timestamp_current:\t$utils_env_alias_timestamp_current"
+	log_print "UTILS_ENV_ALIAS_TIMESTAMP:\t\t$UTILS_ENV_ALIAS_TIMESTAMP"
 
 	[ "$utils_env_timestamp_current" != "$UTILS_ENV_TIMESTAMP" ] && echo "Updating commands..." && source "$HOME_UTILS_ENV/lib-env"
 	[ "$utils_env_alias_timestamp_current" != "$UTILS_ENV_ALIAS_TIMESTAMP" ] && echo "Updating aliases..." && source "$HOME/.utils-env/$UTILS_ENV_ALIASES"

@@ -1,4 +1,24 @@
-избавиться от sudo.bat
+	☐	0:20 	utils-env: cmd_utils_env_color_rgb
+	☐	0:20 	utils-env: cmd_utils_env_ansi_sgr "blank" "bold" "red" "on:grey" "text" - if text absent => code sample
+			☐		utils-env: cmd_utils_env_ansi_sgr_255 "blank" "bold" "red" "on:grey" "text"
+			☐		utils-env: cmd_utils_env_ansi_sgr_rgb "blank" "bold" "red" "on:grey" "text"
+			☐	utils-env: pren - сделать для любого проекта а не только если сэт текущий
+			☐	utils-git: alias for edit gitignore
+		. go <utils> #by which
+		setup(script)
+			☐	setup chmod; 
+					filter files by first line
+					chmod +x *
+			☐	test os - 
+					set endline style & set git autoCrLf & safeCrLf? -
+						unix: perl -pi -e 's/\r\n|\n|\r/\n/g' *
+						msys: ("default_line_ending": "unix"); ?? works?  need to dos style?
+					set PATH in
+		env
+			☐	pathadd -> to .bash_profile if *nix
+			☐	test GITUSER & pwd (store in osx?)
+			☐	добавить алиасы цветов для echo в profile
+
 pathprepend
 pathremove
 

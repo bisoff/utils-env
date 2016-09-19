@@ -247,7 +247,8 @@ cmd_utils_env_colors(){			# colors
 	#echo "2 ${cname[2]}"
 
 	# character ESC  =  ASCII decimal 27  =  hex 0x1B  = octal 033   
-	for imode in 0 1 2 4 5 7; do   # 3 8 6 - not supportd
+	#for imode in 0 1 2 4 5 7; do   # 3 8 6 - not supportd
+	for imode in 0 1 2 3 4 5 6 7 8; do
 		#echo imode: $imode
 		#cmd_utils_env_show_color $imode 31 40 # 40:black
 		#cmd_utils_env_show_color 1 31 40 # 40:black
@@ -294,7 +295,7 @@ cmd_utils_env_colors_255(){		# xcolors
 		echo
 	  done
 	}
-cmd_utils_env_show_ext_color(){ 		# 
+cmd_utils_env_show_ext_color(){ 	# 
 	local color="$1"
 	local esc='\033'
 	local reset_all="$esc[0m"

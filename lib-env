@@ -5,8 +5,8 @@ UTILS_ENV_INCLUDE="utils-env-include"
 UTILS_ENV_ALIASES="utils-env-aliases"
 case "$UTILS_ENV_THE_OS" in
 	MINGW*)
-		UTILS_ENV_TIMESTAMP=`stat -f "%Sm" -t "%F %T" $HOME_UTILS_ENV/lib-env`
-		UTILS_ENV_ALIAS_TIMESTAMP=`stat -f "%Sm" -t "%F %T" $HOME/.utils-env/$UTILS_ENV_ALIASES`
+		UTILS_ENV_TIMESTAMP=`stat -c %y $HOME_UTILS_ENV/lib-env`
+		UTILS_ENV_ALIAS_TIMESTAMP=`stat -c %y  $HOME/.utils-env/$UTILS_ENV_ALIASES`
 		UTILS_ENV_SED="sed"
 		;;
 	Darwin)
@@ -29,8 +29,8 @@ cmd_utils_env_wrapper(){
 	local utils_env_timestamp_current
 	case "$UTILS_ENV_THE_OS" in
 		MINGW*)
-			utils_env_timestamp_current=`stat -f "%Sm" -t "%F %T" $HOME_UTILS_ENV/lib-env`
-			utils_env_alias_timestamp_current=`stat -f "%Sm" -t "%F %T" $HOME/.utils-env/$UTILS_ENV_ALIASES`
+			utils_env_timestamp_current=`stat -c %y $HOME_UTILS_ENV/lib-env`
+			utils_env_alias_timestamp_current=`stat -c %y  $HOME/.utils-env/$UTILS_ENV_ALIASES`
 			;;
 		Darwin)
 			utils_env_timestamp_current=$(stat -f "%Sm" -t "%F %T" "$HOME_UTILS_ENV/lib-env")

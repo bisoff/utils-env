@@ -125,30 +125,31 @@ cmd_utils_env_ed(){ 			# ed
 
 	fileToEdit="$1"
 	echo "FILE: '$fileToEdit'"
-	if [[ -f $1 ]]; then
-		if [[ "$EDITOR" = "" ]]; then
-			[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim $1 #echo editor #
-			[[ "$UTILS_ENV_THE_OS" == "" ]] && start $1
+	if [[ -f "$fileToEdit" ]]; then
+		# echo "file exist"
+		if [[ "$EDITOR" == "" ]]; then
+			echo EDITOR empty
+			[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim "$fileToEdit"
+			[[ "$UTILS_ENV_THE_OS" == "" ]] && start "$fileToEdit"
 		  else
 			#echo "$EDITOR $1"
-			"$EDITOR" "$1"
+			eval "$EDITOR '$fileToEdit'"
 		  fi
 	  else
-	  	[ "$fileToEdit=" != "" ] && fileToEdit=$(which $1 2>/dev/null)
+	  	[ "$fileToEdit=" != "" ] && fileToEdit=$(which "$fileToEdit" 2>/dev/null)
 		#[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && fileToEdit=$(where $1 2>/dev/null)
-	  	if [[ "$1" != "" && "$fileToEdit" = "" ]]; then
-	  		echo -e "FILE NOT FOUND\n    fileToEdit: $1\n    path: $PWD"
+	  	if [[ "$fileToEdit" == "" ]]; then
+	  		echo -e "FILE NOT FOUND\n    fileToEdit: $fileToEdit\n    path: $PWD"
 	  	  else
-			echo FILE: $fileToEdit
-	  		if [[ "$EDITOR" = "" ]]; then
-				[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim $fileToEdit
-				[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && start $fileToEdit
+			#echo FILE: "$fileToEdit"
+	  		if [[ "$EDITOR" == "" ]]; then
+	  			echo EDITOR empty
+				[[ "$UTILS_ENV_THE_OS" == "Darwin" ]] && vim "$fileToEdit"
+				[[ "$UTILS_ENV_THE_OS" == "Cygwin" ]] && start "$fileToEdit"
 			  else
-	  	  		#echo "$EDITOR $file"
-	  	  		"$EDITOR" "$fileToEdit"
+	  	  		echo "$EDITOR '$fileToEdit'"
+	  	  		eval "$EDITOR '$fileToEdit'" # 
 			  fi
-			#sublime_text.exe
-			#$ED
 	  	  fi
 	  fi
 	}
